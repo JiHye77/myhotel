@@ -22,7 +22,7 @@ public class PolicyHandler{
         // Sample Logic //
         Reservation reservation = new Reservation();
         reservation.setOrderId(paymentApproved.getOrderId());
-        reservation.setStatus("Reservated"); 
+        reservation.setStatus("Reserved"); 
         reservationRepository.save(reservation);
             
     }
