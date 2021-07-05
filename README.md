@@ -41,7 +41,7 @@ Final Project AWS 3차수 - 이지혜
 2. 고객이 결제를 진행한다.
 3. 예약이 신청 되면 신청내역이 호텔에 전달된다. 
 4. 호텔 관리자가 신청내역을 확인하여 예약을 확정한다.
-5. 호텔 예약했던 고객은 호텔 Review를 작성할 수 있다.
+5. 호텔 예약했던 고객은 Review를 작성할 수 있다.
 6. 고객이 예약 진행상태 및 Review 정보를 원할 때마다 조회한다.
 
 
@@ -74,81 +74,57 @@ Final Project AWS 3차수 - 이지혜
 ![ver2](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/storming_2.JPG)
 
 #### ver3 - attribute생성
-![final](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/storming_new.JPG)
-
+![image](https://user-images.githubusercontent.com/84304007/124426010-5aa3ee80-dda4-11eb-9eaa-87b07bd30491.png)
 
 ### 기능 요구사항을 커버하는지 검증
 1. 고객이 원하는 일자를 선택하고 예약한다.  --> O
 2. 고객이 결제를 진행한다.  --> O
-3. 예약이 신청 되면 신청내역이 검진센터에 전달된다.   --> O
-4. 검진센터 관리자가 신청내역을 확인하여 예약을 확정한다.   --> O
-5. 고객이 예약을 취소할 수 있다.  --> O
-6. 예약이 취소 되면 검진 예약이 취소 된다.  --> O
-7. 예약이 취소 되면 결제도 취소된다.  --> O
-8. 고객이 예약 취소를 하면 예약 정보는 삭제 상태로 갱신 된다.  --> O
-9. 고객이 예약 진행상태를 원할 때마다 조회한다.  --> O
-10. 예약 상태가 변경되면 SMS로 알림이 발송된다.  --> O
+3. 예약이 신청 되면 신청내역이 호텔에 전달된다.   --> O
+4. 호텔 관리자가 신청내역을 확인하여 예약을 확정한다.  --> O
+5. 호텔 예약했던 고객은 Review를 작성할 수 있다.  --> O
+6. 고객이 예약 진행상태 및 Review 정보를 원할 때마다 조회한다.  --> O
 
 
 ### 비기능 요구사항을 커버하는지 검증
 
 1. 트랜잭션
    - 결제가 되지 않으면 검진예약 신청이 처리되지 않아야 한다. `Sync 호출` --> O
-   - 예약이 취소되면 결제도 취소가 되어야 한다. `Sync 호출` --> O
    ==>  Request-Response 방식 처리
    
 2. 장애격리
-   - 검진센터관리자 기능이 수행 되지 않더라도 예약은 365일 24시간 받을 수 있어야 한다. `Pub/Sub` --> O
+   - 호텔 관리자 기능이 수행 되지 않더라도 예약은 365일 24시간 받을 수 있어야 한다. `Pub/Sub` --> O
    ==>  Pub/Sub 방식으로 처리(Pub/Sub)
    - 결제 시스템이 과중되면 사용자를 잠시동안 받지 않고 결제를 잠시후에 하도록 유도 한다.
      (장애처리)
 
 3. 성능
    - 고객이 예약 확인 상태를 마이페이지에서 확인할 수 있어야 한다. `CQRS`
-   - 예약 상태가 바뀔 때 마다 SMS로 알림이 발송되어야 한다.
 
 
 ## 구현
 분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라, 각 BC별로 대변되는 마이크로 서비스들을 스프링부트로 구현.
-각 서비스 별로 포트넘버 부여 확인 ( 8081 ~ 8084 )
+각 서비스 별로 포트넘버 부여 확인 ( 8081 ~ 8085 )
 
-### 포트넘버 분리
-```
-spring:
-  profiles: default
-  cloud:
-    gateway:
-      routes:
-        - id: order
-          uri: http://localhost:8081
-          predicates:
-            - Path=/orders/** 
-        - id: reservation
-          uri: http://localhost:8082
-          predicates:
-            - Path=/reservations/**,/cancellations/** 
-        - id: payment
-          uri: http://localhost:8083
-          predicates:
-            - Path=/paymentHistories/** 
-        - id: customer
-          uri: http://localhost:8084
-          predicates:
-            - Path= /mypages/**
+### 포트넘버 분리 (Gateway의 application.yml 파일)
+![image](https://user-images.githubusercontent.com/84304007/124426249-c1c1a300-dda4-11eb-893d-34435b3079a1.png)
+
 ```
 
 ### 각 서비스를 수행
 ```
-cd /home/project/health_center/order
+cd /home/project/myhotel/payment
 mvn spring-boot:run
 
-cd /home/project/health_center/payment
+cd /home/project/myhotel/reservation
 mvn spring-boot:run
 
-cd /home/project/health_center/reservation
+cd /home/project/myhotel/order
 mvn spring-boot:run
 
-cd /home/project/health_center/notification
+cd /home/project/myhotel/review
+mvn spring-boot:run
+
+cd /home/project/myhotel/customer
 mvn spring-boot:run
 
 netstat -anlp | grep :808
@@ -446,7 +422,7 @@ Transfer-Encoding: chunked
 
 
 #결제서비스 재기동
-cd /home/project/healthcenter/payment
+cd /home/project/myhotel/payment
 mvn spring-boot:run
 
 #주문처리
@@ -621,7 +597,7 @@ API gateway 를 통해 MSA 진입점을 통일 시킨다.
 cd gateway
 mvn spring-boot:run
 
-# api gateway를 통한 prime 타입의 검진예약주문
+# api gateway를 통한 prime 타입의 호텔 예약주문
 http localhost:8080/orders orderType=prime name=jung
 
 HTTP/1.1 201 
@@ -822,7 +798,7 @@ mvn clean package -B
 ![ysjung03.png](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/ysjung03.png)
 ![ysjung04.png](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/ysjung04.png)
 
-###### 네임스페이스 healthcenter 생성 및 이동
+###### 네임스페이스 hotelreservation 생성 및 이동
 ```sh
 kubectl create namespace healthcenter
 kubectl config set-context --current --namespace=healthcenter
