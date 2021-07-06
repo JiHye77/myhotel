@@ -88,13 +88,13 @@ Final Project AWS 3차수 - 이지혜
 ### 비기능 요구사항을 커버하는지 검증
 
 1. 트랜잭션
-   - 결제가 되지 않으면 검진예약 신청이 처리되지 않아야 한다. `Sync 호출` --> O
+   - 결제가 되지 않으면 검진예약 신청이 처리되지 않아야 한다. `Sync 호출` --> O  
    ==>  Request-Response 방식 처리
    
 2. 장애격리
-   - 호텔 관리자 기능이 수행 되지 않더라도 예약은 365일 24시간 받을 수 있어야 한다. `Pub/Sub` --> O
+   - 호텔 관리자 기능이 수행 되지 않더라도 예약은 365일 24시간 받을 수 있어야 한다. `Pub/Sub` --> O  
    ==>  Pub/Sub 방식으로 처리(Pub/Sub)
-   - 결제 시스템이 과중되면 사용자를 잠시동안 받지 않고 결제를 잠시후에 하도록 유도 한다.
+   - 결제 시스템이 과중되면 사용자를 잠시동안 받지 않고 결제를 잠시후에 하도록 유도 한다.  
      (장애처리)
 
 3. 성능
@@ -112,22 +112,22 @@ Final Project AWS 3차수 - 이지혜
 
 ### 각 서비스를 수행
 ```
-cd /home/project/myhotel/payment
+cd /home/project/myhotel/payment  
 mvn spring-boot:run
 
-cd /home/project/myhotel/reservation
+cd /home/project/myhotel/reservation  
 mvn spring-boot:run
 
-cd /home/project/myhotel/order
+cd /home/project/myhotel/order  
 mvn spring-boot:run
 
-cd /home/project/myhotel/review
+cd /home/project/myhotel/review  
 mvn spring-boot:run
 
-cd /home/project/myhotel/customer
+cd /home/project/myhotel/customer  
 mvn spring-boot:run
 
-netstat -anlp | grep :808
+netstat -anlp | grep :808  
 ```
 
 ## DDD 의 적용
