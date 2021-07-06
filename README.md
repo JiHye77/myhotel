@@ -727,56 +727,96 @@ server:
 
 ```
 # mypage 호출 
-http localhost:8084/mypages/2
+http GET http://localhost:8084/mypages/1
 
-HTTP/1.1 200 
+HTTP/1.1 200
 Content-Type: application/hal+json;charset=UTF-8
-Date: Mon, 21 Jun 2021 10:56:50 GMT
+Date: Tue, 06 Jul 2021 06:05:23 GMT
 Transfer-Encoding: chunked
 
 {
     "_links": {
         "mypage": {
-            "href": "http://localhost:8084/mypages/2"
+            "href": "http://localhost:8084/mypages/1"
         },
         "self": {
-            "href": "http://localhost:8084/mypages/2"
+            "href": "http://localhost:8084/mypages/1"
         }
     },
-    "name": "woo",
-    "orderId": 2,
-    "reservationId": 6,
-    "status": "Reservation Complete"
+    "guest": 123,
+    "name": "Jihye",
+    "orderId": 1,
+    "reservationId": 2,
+    "status": "Reserved",
+    "text": "Excellent"
 }
 ```
 - 여러개의 리스트 
-```{
-    "_links": {
-        "mypage": {
-            "href": "http://localhost:8084/mypages/5"
-        },
-        "self": {
-            "href": "http://localhost:8084/mypages/5"
-        }
-    },
-    "name": "jung",
-    "orderId": 3,
-    "reservationId": 2,
-    "status": "Reservation Complete"
-},
+```
 {
+    "_embedded": {
+        "mypages": [
+            {
+                "_links": {
+                    "mypage": {
+                        "href": "http://localhost:8084/mypages/1"
+                    },
+                    "self": {
+                        "href": "http://localhost:8084/mypages/1"
+                    }
+                },
+                "guest": 123,
+                "name": "Jihye",
+                "orderId": 1,
+                "reservationId": 2,
+                "status": "Reserved",
+                "text": "Excellent"
+            },
+            {
+                "_links": {
+                    "mypage": {
+                        "href": "http://localhost:8084/mypages/2"
+                    },
+                    "self": {
+                        "href": "http://localhost:8084/mypages/2"
+                    }
+                },
+                "guest": null,
+                "name": "JRJR",
+                "orderId": 1,
+                "reservationId": null,
+                "status": null,
+                "text": null
+            },
+            {
+                "_links": {
+                    "mypage": {
+                        "href": "http://localhost:8084/mypages/3"
+                    },
+                    "self": {
+                        "href": "http://localhost:8084/mypages/3"
+                    }
+                },
+                "guest": null,
+                "name": "CJR",
+                "orderId": 2,
+                "reservationId": 3,
+                "status": "Reserved",
+                "text": null
+            }
+        ]
+    },
     "_links": {
-        "mypage": {
-            "href": "http://localhost:8084/mypages/2"
+        "profile": {
+            "href": "http://localhost:8084/profile/mypages"
+        },
+        "search": {
+            "href": "http://localhost:8084/mypages/search"
         },
         "self": {
-            "href": "http://localhost:8084/mypages/2"
+            "href": "http://localhost:8084/mypages"
         }
-    },
-    "name": "woo",
-    "orderId": 2,
-    "reservationId": 6,
-    "status": "Reservation Complete"
+    }
 }
 ```
 
