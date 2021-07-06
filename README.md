@@ -236,22 +236,25 @@ public interface OrderRepository extends PagingAndSortingRepository<Order, Long>
 
 - 적용 후 REST API 의 테스트
 ```
-# app 서비스의 주문처리
-http localhost:8081/orders orderType=basic
+# 호텔 서비스의 주문처리
+http localhost:8081/orders roomType=single guest=123 name=Jihye
 
 # pay 서비스의 결제처리
-http localhost:8083/paymentHistories orderId=1 price=50000 payMethod=card
+http localhost:8083/payments orderId=1 cardNo=111
 
 # reservation 서비스의 예약처리
-http localhost:8082/reservations orderId=1 status="confirmed"
+http localhost:8082/reservations orderId=1 status="Reserved"
+
+# review 서비스 등록 처리
+http http://localhost:8085/reviews orderId=1 text="Excellent"
 
 # 주문 상태 확인(mypage)
 
 http localhost:8081/orders/3
-root@labs--1428063258:/home/project/healthcenter# http localhost:8084/mypages/1
+root@labs--1428063258:/home/project/myhotel# http http://localhost:8084/mypages/1
 HTTP/1.1 200 
 Content-Type: application/hal+json;charset=UTF-8
-Date: Mon, 21 Jun 2021 10:43:12 GMT
+Date: Thu, 08 July 2021 10:43:12 GMT
 Transfer-Encoding: chunked
 
 {
@@ -263,22 +266,23 @@ Transfer-Encoding: chunked
             "href": "http://localhost:8084/mypages/1"
         }
     },
-    "name": null,
+    "guest": 123,
+    "name": "Jihye",
     "orderId": 1,
-    "reservationId": 3,
-    "status": "confirmed"
+    "reservationId": 1,
+    "status": "Reviewed",
+    "text": "Excellent"
 }
-
 
 ```
 
 ## 폴리글랏 퍼시스턴스
 비지니스 로직은 내부에 순수한 형태로 구현
-그 이외의 것을 어댑터 형식으로 설계 하여 해당 비지니스 로직이 어느 환경에서도 잘 도작하도록 설계
+그 이외의 것을 어댑터 형식으로 설계 하여 해당 비지니스 로직이 어느 환경에서도 잘 도착하도록 설계
 
 ![polyglot](https://user-images.githubusercontent.com/76020494/108794206-b07fb300-75c8-11eb-9f97-9a4e1695588c.png)
 
-폴리그랏 퍼시스턴스 요건을 만족하기 위해 기존 h2를 hsqldb로 변경
+폴리그랏 퍼시스턴스 요건을 만족하기 위해 기존 h2를 hsqldb로 변경 (order서비스의 pom.xml)
 
 ```
 <!--		<dependency>-->
@@ -295,11 +299,11 @@ Transfer-Encoding: chunked
 		</dependency>
 
 # 변경/재기동 후 예약 주문
- http localhost:8081/orders orderType=basic name=woo
+ http localhost:8081/orders roomType=double name=CJR
  
-HTTP/1.1 201 
+HTTP/1.1 201
 Content-Type: application/json;charset=UTF-8
-Date: Mon, 21 Jun 2021 10:53:32 GMT
+Date: Tue, 06 Jul 2021 04:38:05 GMT
 Location: http://localhost:8081/orders/2
 Transfer-Encoding: chunked
 
@@ -313,8 +317,9 @@ Transfer-Encoding: chunked
         }
     },
     "cardNo": null,
-    "name": "woo",
-    "orderType": "basic",
+    "guest": null,
+    "name": "CJR",
+    "roomType": "double",
     "status": null
 }
 
@@ -322,9 +327,9 @@ Transfer-Encoding: chunked
 
 http localhost:8084/mypages/2
 
-HTTP/1.1 200 
+HTTP/1.1 200
 Content-Type: application/hal+json;charset=UTF-8
-Date: Mon, 21 Jun 2021 10:55:04 GMT
+Date: Tue, 06 Jul 2021 04:39:14 GMT
 Transfer-Encoding: chunked
 
 {
@@ -336,15 +341,14 @@ Transfer-Encoding: chunked
             "href": "http://localhost:8084/mypages/2"
         }
     },
-    "name": "woo",
+    "guest": null,
+    "name": "CJR",
     "orderId": 2,
-    "reservationId": 5,
-    "status": "Reservation Complete"
+    "reservationId": 2,
+    "status": "Reserved",
+    "text": null
 }
-
-
 ```
-
 
 
 ## 동기식 호출 과 Fallback 처리
@@ -353,20 +357,24 @@ Transfer-Encoding: chunked
 
 - 결제서비스를 호출하기 위하여 Stub과 (FeignClient) 를 이용하여 Service 대행 인터페이스 (Proxy) 를 구현 
 ```
-# (external) PaymentHistoryService.java
+# (external) PaymentService.java
 
-package healthcenter.external;
+package hotelreservation.external;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@FeignClient(name="payment", url="${api.payment.url}")
-public interface PaymentHistoryService {
+import java.util.Date;
 
-    @RequestMapping(method= RequestMethod.POST, path="/paymentHistories")
-    public void pay(@RequestBody PaymentHistory paymentHistory);
+// @FeignClient(name="payment", url="http://payment:8080")
+// @FeignClient(name="payment", url="http://localhost:8083")
+@FeignClient(name="payment", url="${feign.client.url.paymentUrl}")
+public interface PaymentService {
+
+    @RequestMapping(method= RequestMethod.POST, path="/payments")
+    public void pay(@RequestBody Payment payment);
 
 }                      
 ```
@@ -380,25 +388,27 @@ public interface PaymentHistoryService {
         BeanUtils.copyProperties(this, ordered);
         ordered.publishAfterCommit();
 
+        //Following code causes dependency to external APIs
+        // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
 
-        healthcenter.external.PaymentHistory paymentHistory = new healthcenter.external.PaymentHistory();
-
-        PaymentHistory payment = new PaymentHistory();
-        System.out.println("this.id() : " + this.id);
-        payment.setOrderId(this.id);
-        payment.setStatus("Reservation OK");
+        hotelreservation.external.Payment payment = new hotelreservation.external.Payment();
         // mappings goes here
-        OrderApplication.applicationContext.getBean(healthcenter.external.PaymentHistoryService.class)
+        payment.setOrderId(this.getId());
+        payment.setCardNo(this.getCardNo());
+        // payment.setStatus(this.getStatus());
+        payment.setStatus("Paid");
+
+        OrderApplication.applicationContext.getBean(hotelreservation.external.PaymentService.class)
             .pay(payment);
     }
 ```
 
-- 동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하며, 결제 시스템이 장애가 나면 주문도 못받는다는 것을 확인:
+- 동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하며, 결제 시스템이 장애가 나면 주문도 못받는다는 것을 확인:  --> 해야됨   
 ```
-# 결제 (payment) 서비스를 잠시 내려놓음 (ctrl+c)
+# 결제 (payment) 서비스를 잠시 내려놓음 (ctrl+c) 
 
 #주문처리
- http localhost:8081/orders orderType=prime name=jung
+ http localhost:8081/orders roomType=prime name=jung
 
 #Fail
 HTTP/1.1 500 
@@ -417,7 +427,7 @@ Transfer-Encoding: chunked
 
 
 #결제서비스 재기동
-cd /home/project/myhotel/payment
+cd /home/project/myhotel/payment  
 mvn spring-boot:run
 
 #주문처리
@@ -448,13 +458,13 @@ Transfer-Encoding: chunked
 
 ## 비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트
 
-결제가 이루어진 후에 센터예약 시스템으로 이를 알려주는 행위는 동기식이 아니라 비 동기식으로 처리하여 
+결제가 이루어진 후에 호텔 예약 시스템으로 이를 알려주는 행위는 동기식이 아니라 비 동기식으로 처리하여 
 예약 시스템의 처리를 위하여 결제주문이 블로킹 되지 않도록 처리
  
 - 이를 위하여 결제이력에 기록을 남긴 후에 곧바로 결제승인이 되었다는 도메인 이벤트를 카프카로 송출한다(Publish)
  
 ```
-#PaymentHistory.java
+#Payment.java
 
 package healthcenter;
 
