@@ -466,23 +466,31 @@ Transfer-Encoding: chunked
 ```
 #Payment.java
 
-package healthcenter;
+package hotelreservation;
 
 import javax.persistence.*;
 import org.springframework.beans.BeanUtils;
 import java.util.List;
+import java.util.Date;
 
 @Entity
-@Table(name="PaymentHistory_table")
-public class PaymentHistory {
+@Table(name="Payment_table")
+public class Payment {
 
-...
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private Long id;
+    private Long orderId;
+    private Long cardNo;
+    private String status;
+
     @PostPersist
     public void onPostPersist(){
         PaymentApproved paymentApproved = new PaymentApproved();
-        paymentApproved.setStatus("Pay Approved!!");
         BeanUtils.copyProperties(this, paymentApproved);
         paymentApproved.publishAfterCommit();
+
+
     }
 ```
 
@@ -491,9 +499,9 @@ public class PaymentHistory {
 ```
 # (reservation) PolicyHandler.java
 
-package healthcenter;
+package hotelreservation;
 
-import healthcenter.config.kafka.KafkaProcessor;
+import hotelreservation.config.kafka.KafkaProcessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -503,31 +511,27 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PolicyHandler{
-
-    @Autowired
-    private ReservationRepository reservationRepository;
-	
-    @StreamListener(KafkaProcessor.INPUT)
-    public void onStringEventListener(@Payload String eventString){
-
-    }
+    @Autowired ReservationRepository reservationRepository;
 
     @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverPaymentApproved_(@Payload PaymentApproved paymentApproved){
+    public void wheneverPaymentApproved_AcceptReserve(@Payload PaymentApproved paymentApproved){
 
+        if(!paymentApproved.validate()) return;
 
-        if(paymentApproved.isMe()){
-            System.out.println("##### listener  : " + paymentApproved.toJson());
-            Reservation reservation = new Reservation();
-            reservation.setStatus("Reservation Complete");
-            reservation.setOrderId(paymentApproved.getOrderId());
-            reservationRepository.save(reservation);
+        System.out.println("\n\n##### listener AcceptReserve : " + paymentApproved.toJson() + "\n\n");
+
+        // Sample Logic //
+        Reservation reservation = new Reservation();
+        reservation.setOrderId(paymentApproved.getOrderId());
+        reservation.setStatus("Reserved"); 
+        reservationRepository.save(reservation);
             
-        }
     }
+
+    @StreamListener(KafkaProcessor.INPUT)
+    public void whatever(@Payload String eventString){}
 
 }
-
 
 ```
 
@@ -537,7 +541,7 @@ public class PolicyHandler{
 # (reservation)예약 서비스를 잠시 내려놓음 (ctrl+c)
 
 # 주문처리
-http localhost:8081/orders orderType=prime name=jung   #Success
+http localhost:8081/orders roomType=prime name=jung   #Success
 
 # 결제처리
 http localhost:8083/paymentHistories orderId=3 price=50000 payMethod=cash   #Success
@@ -631,9 +635,10 @@ Transfer-Encoding: chunked
 application.yml
 
 server:
-  port: 8080
+  port: 8088
 
 ---
+
 spring:
   profiles: default
   cloud:
@@ -646,15 +651,19 @@ spring:
         - id: reservation
           uri: http://localhost:8082
           predicates:
-            - Path=/reservations/**,/cancellations/** 
+            - Path=/reservations/** 
         - id: payment
           uri: http://localhost:8083
           predicates:
-            - Path=/paymentHistories/** 
-        - id: notification
+            - Path=/payments/** 
+        - id: customer
           uri: http://localhost:8084
           predicates:
             - Path= /mypages/**
+        - id: review
+          uri: http://localhost:8085
+          predicates:
+            - Path=/reviews/** 
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -681,15 +690,19 @@ spring:
         - id: reservation
           uri: http://reservation:8080
           predicates:
-            - Path=/reservations/**,/cancellations/** 
+            - Path=/reservations/** 
         - id: payment
           uri: http://payment:8080
           predicates:
-            - Path=/paymentHistories/** 
+            - Path=/payments/** 
         - id: customer
           uri: http://customer:8080
           predicates:
             - Path= /mypages/**
+        - id: review
+          uri: http://review:8080
+          predicates:
+            - Path=/reviews/** 
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -700,10 +713,6 @@ spring:
             allowedHeaders:
               - "*"
             allowCredentials: true
-            
-logging:
-  level:
-    root: debug
 
 server:
   port: 8080
