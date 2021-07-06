@@ -109,9 +109,8 @@ Final Project AWS 3차수 - 이지혜
 ![image](https://user-images.githubusercontent.com/84304007/124426249-c1c1a300-dda4-11eb-893d-34435b3079a1.png)
 
 ```
-
 ### 각 서비스를 수행
-```
+
 cd /home/project/myhotel/payment  
 mvn spring-boot:run
 
@@ -135,12 +134,12 @@ netstat -anlp | grep :808
 - 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다: 
 - (예시는 order 마이크로 서비스).
 ```
-package healthcenter;
+package hotelreservation;
 
 import javax.persistence.*;
 import org.springframework.beans.BeanUtils;
-
-import healthcenter.external.PaymentHistory;
+import java.util.List;
+import java.util.Date;
 
 @Entity
 @Table(name="Order_table")
@@ -149,8 +148,9 @@ public class Order {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
-    private String orderType;
+    private String roomType;
     private Long cardNo;
+    private Integer guest;
     private String name;
     private String status;
 
@@ -163,24 +163,14 @@ public class Order {
         //Following code causes dependency to external APIs
         // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
 
-        PaymentHistory payment = new PaymentHistory();
-        System.out.println("this.id() : " + this.id);
-        payment.setOrderId(this.id);
-        payment.setStatus("Reservation OK");
+        hotelreservation.external.Payment payment = new hotelreservation.external.Payment();
         // mappings goes here
-        OrderApplication.applicationContext.getBean(healthcenter.external.PaymentHistoryService.class)
+        payment.setOrderId(this.getId());
+        payment.setCardNo(this.getCardNo());
+        payment.setStatus("Paid");
+
+        OrderApplication.applicationContext.getBean(hotelreservation.external.PaymentService.class)
             .pay(payment);
-
-
-    }
-
-    @PostUpdate
-    public void onPostUpdate(){
-    	System.out.println("Order Cancel  !!");
-        OrderCanceled orderCanceled = new OrderCanceled();
-        BeanUtils.copyProperties(this, orderCanceled);
-        orderCanceled.publishAfterCommit();
-
 
     }
 
@@ -192,12 +182,12 @@ public class Order {
     public void setId(Long id) {
         this.id = id;
     }
-    public String getOrderType() {
-        return orderType;
+    public String getRoomType() {
+        return roomType;
     }
 
-    public void setOrderType(String orderType) {
-        this.orderType = orderType;
+    public void setRoomType(String roomType) {
+        this.roomType = roomType;
     }
     public Long getCardNo() {
         return cardNo;
@@ -206,9 +196,13 @@ public class Order {
     public void setCardNo(Long cardNo) {
         this.cardNo = cardNo;
     }
+    public Integer getGuest() {
+        return guest;
+    }
 
-
-
+    public void setGuest(Integer guest) {
+        this.guest = guest;
+    }
     public String getName() {
         return name;
     }
@@ -223,7 +217,7 @@ public class Order {
     public void setStatus(String status) {
         this.status = status;
     }
-
+    
 }
 
 ```
@@ -231,12 +225,13 @@ public class Order {
 - Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 다양한 데이터소스 유형 (RDB or NoSQL) 에 대한 별도의 처리가 없도록 
 데이터 접근 어댑터를 자동 생성하기 위하여 Spring Data REST 의 RestRepository 를 적용하였다
 ```
-package healthcenter;
+package hotelreservation;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface OrderRepository extends PagingAndSortingRepository<Order, Long>{
 }
+
 ```
 
 - 적용 후 REST API 의 테스트
