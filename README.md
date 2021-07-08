@@ -734,36 +734,39 @@ Transfer-Encoding: chunked
 
 ###### ECR 접속 비밀번호 생성
 ```sh
-aws --region "ap-northeast-2" ecr get-login-password
+aws --region "ca-central-1" ecr get-login-password
 ```
 ###### ECR 로그인
 ```sh
-docker login --username AWS -p {ECR 접속 비밀번호} 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com
+docker login --username AWS -p {ECR 접속 비밀번호} 879772956301.dkr.ecr.ca-central-1.amazonaws.com  
 Login Succeeded
 ```
-###### 마이크로서비스 빌드, order/payment/reservation/notification 각각 실행
+###### 마이크로서비스 빌드, order/payment/reservation/customer/review 각각 실행
 ```sh
 mvn clean package -B
 ```
 ###### 컨테이너 이미지 생성
-- docker build -t 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/order:v1 .
-- docker build -t 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/payment:v1 .
-- docker build -t 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/reservation:v1 .
-- docker build -t 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/notification:v1 .
-![ysjung05.png](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/ysjung05.png)
-![ysjung06.png](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/ysjung06.png)
+- docker build -t 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-order:v1 .  
+- docker build -t 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-payment:v1 .
+- docker build -t 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-reservation:v1 .
+- docker build -t 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-customer:v1 .
+- docker build -t 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-review:v1 .  
+![image](https://user-images.githubusercontent.com/84304007/124864403-cc25ac00-dff3-11eb-9998-4b7a3a732001.png)  
+![image](https://user-images.githubusercontent.com/84304007/124864437-da73c800-dff3-11eb-889f-f64dde97490c.png)
+
+
 ###### ECR에 컨테이너 이미지 배포
-- docker push 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/order:v1
-- docker push 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/payment:v1
-- docker push 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/reservation:v1
-- docker push 740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/notification:v1
-![ysjung03.png](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/ysjung03.png)
-![ysjung04.png](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/ysjung04.png)
+- docker push 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-order:v1 .  
+- docker push 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-payment:v1 .
+- docker push 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-reservation:v1 .
+- docker push 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-customer:v1 .
+- docker push 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-review:v1
+![image](https://user-images.githubusercontent.com/84304007/124864340-b57f5500-dff3-11eb-8d29-f63d15abcf27.png)  
 
 ###### 네임스페이스 hotelreservation 생성 및 이동
 ```sh
-kubectl create namespace healthcenter
-kubectl config set-context --current --namespace=healthcenter
+kubectl create namespace hotelreservation
+kubectl config set-context --current --namespace=hotelreservation
 ```
 ###### EKS에 마이크로서비스 배포, order/payment/reservation/notification 각각 실행
 ```sh
