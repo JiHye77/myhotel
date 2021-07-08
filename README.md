@@ -250,7 +250,7 @@ http http://localhost:8085/reviews orderId=1 text="Excellent"
 
 # 주문 상태 확인(mypage)
 
-root@labs-412292045:/home/project/myhotel# http localhost:8081/orders/3
+root@labs-412292045:/home/project/myhotel# http localhost:8084/mypages/1
 HTTP/1.1 200 
 Content-Type: application/hal+json;charset=UTF-8
 Date: Thu, 08 Jul 2021 02:57:15 GMT
