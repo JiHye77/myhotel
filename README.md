@@ -581,7 +581,7 @@ server:
 #order 주문 서비스 호출 시 성공 (8080포트)
 ![image](https://user-images.githubusercontent.com/84304007/124870526-d51b7b00-dffd-11eb-951c-644728a33f9a.png)
 
-```
+
 ## 마이페이지
 # CQRS
 - 고객이 예약건에 대한 Status를 조회할 수 있도록 CQRS로 구현하였음.
