@@ -774,15 +774,15 @@ hystrix:
 ```
 * 동시사용자 1명으로 부하 생성시 정상  
 ```
-siege -c1 -t10S -v --content-type "application/json" 'http://a6fb12afceb3241e5b3cee8a2f04e18c-312668797.ca-central-1.elb.amazonaws.com:8080/orders POST {"roomType": "double", "guest": "ABAB"}'  
+siege -c1 -t10S -v --content-type "application/json" 'http://a6fb12afceb3241e5b3cee8a2f04e18c-312668797.ca-central-1.elb.amazonaws.com:8080/orders POST {"roomType": "double", "guest": "123"}'  
 ```
-![image](https://user-images.githubusercontent.com/84304007/124883688-8e814d00-e00c-11eb-8e84-8f4e0644b0d2.png)  
+![image](https://user-images.githubusercontent.com/84304007/124884565-5a5a5c00-e00d-11eb-986d-ab04fadd3a54.png)  
 
 
 * 부하테스터 siege 툴을 통한 서킷 브레이커 동작 확인:  
 - 동시사용자 2명으로 부하 생성시 서킷 브레이커 동작 확인  
 ```  
-siege -c2 -t10S -v --content-type "application/json" 'http://a6fb12afceb3241e5b3cee8a2f04e18c-312668797.ca-central-1.elb.amazonaws.com:8080/orders POST {"roomType": "double", "guest": "ABAB"}'    
+siege -c2 -t10S -v --content-type "application/json" 'http://a6fb12afceb3241e5b3cee8a2f04e18c-312668797.ca-central-1.elb.amazonaws.com:8080/orders POST {"roomType": "double", "guest": "111"}'    
 
 ```
 ![image](https://user-images.githubusercontent.com/84304007/124883406-419d7680-e00c-11eb-931f-1bb092be6426.png)  
