@@ -707,16 +707,18 @@ mvn clean package -B
 - docker build -t 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-reservation:v1 .
 - docker build -t 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-customer:v1 .
 - docker build -t 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-review:v1 .  
+- docker build -t 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-gateway:v1 .  
 ![image](https://user-images.githubusercontent.com/84304007/124864403-cc25ac00-dff3-11eb-9998-4b7a3a732001.png)  
 ![image](https://user-images.githubusercontent.com/84304007/124864437-da73c800-dff3-11eb-889f-f64dde97490c.png)
 
 
 ###### ECR에 컨테이너 이미지 배포
-- docker push 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-order:v1 .  
-- docker push 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-payment:v1 .
-- docker push 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-reservation:v1 .
-- docker push 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-customer:v1 .
-- docker push 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-review:v1
+- docker push 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-order:v1  
+- docker push 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-payment:v1
+- docker push 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-reservation:v1
+- docker push 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-customer:v1
+- docker push 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-review:v1  
+- docker push 879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-gateway:v1 
 ![image](https://user-images.githubusercontent.com/84304007/124864340-b57f5500-dff3-11eb-8d29-f63d15abcf27.png)  
 
 ###### 네임스페이스 hotelreservation 생성 및 이동
