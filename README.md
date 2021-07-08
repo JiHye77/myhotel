@@ -768,23 +768,22 @@ mvn clean package -B
 kubectl create namespace hotelreservation
 kubectl config set-context --current --namespace=hotelreservation
 ```
-###### EKS에 마이크로서비스 배포, order/payment/reservation/notification 각각 실행
+###### EKS에 마이크로서비스 배포, order/payment/reservation/customer/review/gateway 각각 실행
 ```sh
-kubectl create -f deployment.yml 
+kubectl create deploy order --image=879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-order:v1 -n hotelreservation  
+kubectl expose deploy order --type="ClusterIP" --port=8080 --namespace=hotelreservation  
 ```
 ###### 마이크로서비스 배포 상태 확인
 ```sh
-kubectl get pods
+kubectl get pods  
 ```
-![ysjung02.png](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/ysjung02.png) 
---> 이미지 에러..수정필요(READY 1/1)
+![image](https://user-images.githubusercontent.com/84304007/124867605-5e7c7e80-dff9-11eb-8274-444a7e91d8d7.png)
 
 
 ```sh
-kubectl get deployment
+kubectl get deployment  
 ```
-![ysjung01.png](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/ysjung01.png)  
---> 이미지 에러..수정필요(available 뜬것 확인)
+![image](https://user-images.githubusercontent.com/84304007/124867641-70f6b800-dff9-11eb-8af5-029fd44b2147.png)
 
 
 ##### 마이크로서비스 동작 테스트
