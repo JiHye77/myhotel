@@ -921,7 +921,8 @@ livenessProbe에 /tmp/healthy 파일이 존재하는지 재확인하는 설정�
 ```
 # kubectl describe pod review -n hotelreservation
 ```
-![7](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/7.PNG)
+![image](https://user-images.githubusercontent.com/84304007/124918927-905d0780-e030-11eb-900a-9e5b5e49acc1.png)  
+
 - 컨테이너 실행 후 90초 동인은 정상이나 이후 /tmp/healthy 파일이 삭제되어 livenessProbe에서 실패를 리턴하게 되고, pod 정상 상태 일 때 pod 진입하여 /tmp/healthy 파일 생성해주면 정상 상태 유지 확인
 
 ```
@@ -929,7 +930,6 @@ livenessProbe에 /tmp/healthy 파일이 존재하는지 재확인하는 설정�
 ```
 
 ```
-
 root@labs-412292045:/home/project/myhotel/review/kubernetes# kubectl get po -n hotelreservation -w
 NAME                          READY   STATUS    RESTARTS   AGE
 customer-7c5d45b9bb-mdfls     1/1     Running   0          6h30m
