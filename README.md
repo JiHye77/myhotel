@@ -406,15 +406,15 @@ public interface PaymentService {
 # 결제 (payment) 서비스를 잠시 내려놓음 (ctrl+c) 
 ```
 
-#주문처리 후, Fail error 확인
+# 주문처리 후, Fail error 확인
 ![image](https://user-images.githubusercontent.com/84304007/124857377-279d6d00-dfe7-11eb-9e8d-2c5641524413.png)
 
 
-#결제서비스 재기동
+# 결제서비스 재기동
 cd /home/project/myhotel/payment  
-mvn spring-boot:run
+mvn spring-boot:run  
 
-#주문처리 후, 주문 성공(Success)
+# 주문처리 후, 주문 성공(Success)
 ![image](https://user-images.githubusercontent.com/84304007/124857622-98448980-dfe7-11eb-8d9e-cc33ab5f1440.png)
 
 
@@ -510,17 +510,17 @@ http localhost:8083/payments orderId=5  #Success
 
 ```
 
-# 주문 상태 확인  
+#주문 상태 확인  
 http localhost:8081/orders/5     
 
-# 주문상태 안바뀜 확인 : 주문상태 "null"   
+#주문상태 안바뀜 확인 : 주문상태 "null"   
 ![image](https://user-images.githubusercontent.com/84304007/124858834-c1feb000-dfe9-11eb-90dd-26d5069cdc44.png)  
 
-# reservation 서비스 기동  
-cd /home/project/healthcenter/reservation
+#reservation 서비스 기동  
+cd /home/project/healthcenter/reservation  
 mvn spring-boot:run
 
-# 주문상태 확인 : 주문 상태가 "Reserved"으로 확인    
+#주문상태 확인 : 주문 상태가 "Reserved"으로 확인    
 
 ![image](https://user-images.githubusercontent.com/84304007/124858906-e35f9c00-dfe9-11eb-87b7-97313e8fe9a4.png)  
 
@@ -530,34 +530,15 @@ mvn spring-boot:run
 API gateway 를 통해 MSA 진입점을 통일 시킨다.
 
 ```
-# gateway 기동(8080 포트)
+# gateway 기동(8088 포트)
 cd gateway
 mvn spring-boot:run
 
 # api gateway를 통한 twin 타입의 호텔 예약주문
-http localhost:8080/orders roomType=twin name=JHJH
-
-HTTP/1.1 201 
-Content-Type: application/json;charset=UTF-8
-Date: Mon, 21 Jun 2021 12:47:48 GMT
-Location: http://localhost:8081/orders/2
-Transfer-Encoding: chunked
-
-{
-    "_links": {
-        "order": {
-            "href": "http://localhost:8081/orders/2"
-        },
-        "self": {
-            "href": "http://localhost:8081/orders/2"
-        }
-    },
-    "cardNo": null,
-    "name": "jung",
-    "orderType": "prime",
-    "status": null
-}
+http localhost:8088/orders roomType=twin name=JHJH
 ```
+![image](https://user-images.githubusercontent.com/84304007/124859578-2706d580-dfeb-11eb-8a99-310be38bca4f.png)
+
 
 ```
 application.yml
