@@ -913,12 +913,13 @@ livenessProbe에 /tmp/healthy 파일이 존재하는지 재확인하는 설정�
 - periodSeconds 값으로 3초마다/tmp/healthy 파일의 존재 여부를 조회
 - 파일이 존재하지 않을 경우, 정상 작동에 문제가 있다고 판단되어 kubelet에 의해 자동으로 컨테이너가 재시작
 
-#### reservation deployment.yml 파일 수정
+#### review deployment.yml 파일 수정
+![image](https://user-images.githubusercontent.com/84304007/124918009-7a9b1280-e02f-11eb-9ede-27b3a6feb44c.png)  
 
-![6](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/6.PNG)
+
 #### 설정 수정된 상태 확인
 ```
-# kubectl describe pod reservation -n healthcenter
+# kubectl describe pod review -n hotelreservation
 ```
 ![7](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/7.PNG)
 - 컨테이너 실행 후 90초 동인은 정상이나 이후 /tmp/healthy 파일이 삭제되어 livenessProbe에서 실패를 리턴하게 되고, pod 정상 상태 일 때 pod 진입하여 /tmp/healthy 파일 생성해주면 정상 상태 유지 확인
@@ -928,7 +929,21 @@ livenessProbe에 /tmp/healthy 파일이 존재하는지 재확인하는 설정�
 ```
 
 ```
-root@labs--244363308:/home/project# kubectl get po -n healthcenter -w
+
+root@labs-412292045:/home/project/myhotel/review/kubernetes# kubectl get po -n hotelreservation -w
+NAME                          READY   STATUS    RESTARTS   AGE
+customer-7c5d45b9bb-mdfls     1/1     Running   0          6h30m
+gateway-6458c69958-czpws      1/1     Running   0          6h29m
+order-58fb8b46bd-ps9lf        1/1     Running   0          4h16m
+payment-6b957d89f8-m4r6c      1/1     Running   0          3h49m
+reservation-8588b9cc4-sxcll   1/1     Running   0          6h31m
+review-986c9766-wn759         1/1     Running   0          15m
+siege                         1/1     Running   0          79m
+siege-5c7c46b788-9w5l5        1/1     Running   0          4h21m
+
+
+* 아래와 같은 유사한 결과가 나와야 하나 확인 못함..
+
 NAME                              READY   STATUS              RESTARTS   AGE
 efs-provisioner-f4f7b5d64-zfkpg   0/1     ContainerCreating   0          39m
 notification-57cb4df96b-2h4w9     1/1     Running             111        9h
@@ -952,8 +967,8 @@ reservation-857df7bfd8
 ```
 EFS 생성 시 클러스터의 VPC를 선택해야함
 ```
-![클러스터의 VPC를 선택해야함](https://github.com/JiHye77/AWS3_healthcenter/blob/main/refer/1%20vpc.JPG)
-![EFS생성](https://github.com/JiHye77/AWS3_healthcenter/blob/main/refer/2%20filesystem.JPG)
+![image](https://user-images.githubusercontent.com/84304007/124917885-53444580-e02f-11eb-91d4-458945d170c7.png)  
+![image](https://user-images.githubusercontent.com/84304007/124917729-209a4d00-e02f-11eb-8956-40f90790ff11.png)  
 
 2. EFS 계정 생성 및 ROLE 바인딩
 ```
