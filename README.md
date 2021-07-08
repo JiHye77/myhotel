@@ -756,7 +756,7 @@ kubectl get deployment
 
 시나리오는 주문(order) -->결제(pay) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
 
-- Hystrix 를 설정:  요청처리 쓰레드에서 처리시간이 300 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
+- Hystrix 를 설정:  요청처리 쓰레드에서 처리시간이 61- 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
 - 임의의 부하처리를 위해 결제서비스내 sleep을 random하게 적용하였다.
 ```
 # Order 서비스, application.yml에 추가
@@ -777,10 +777,25 @@ hystrix:
 ```  
 siege -c100 -t60S -v --content-type "application/json" 'http://a6fb12afceb3241e5b3cee8a2f04e18c-312668797.ca-central-1.elb.amazonaws.com:8080/orders POST {"roomType": "double", "guest": "111"}'    
 
+defaulting to time-based testing: 60 seconds
+
+{	"transactions":			        1054,
+	"availability":			       85.57
+	"elapsed_time":			       59.74,
+	"data_transferred":		        0.30,
+	"response_time":		        5.47,
+	"transaction_rate":		       17.64,
+	"throughput":			        0.00,
+	"concurrency":			       96.58,
+	"successful_transactions":	        1054,
+	"failed_transactions":		         258,
+	"longest_transaction":		        8.41,
+	"shortest_transaction":		        0.44
+}
+
 ```
-![image](https://user-images.githubusercontent.com/84304007/124883406-419d7680-e00c-11eb-931f-1bb092be6426.png)  
   
-- 95.83% 성공, 4.27% 실패  
+- 85.57% 성공
 
 
 
