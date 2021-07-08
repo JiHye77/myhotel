@@ -529,7 +529,7 @@ mvn spring-boot:run
 API gateway 를 통해 MSA 진입점을 통일 시킨다.
 
 ```
-#gateway 스프링부트 App을 추가 후 application.yaml내에 각 마이크로 서비스의 routes 를 추가하고 gateway 서버의 포트를 8080 
+#gateway 스프링부트 App을 추가 후 application.yaml내에 각 마이크로 서비스의 routes 를 추가하고 gateway 서버의 포트를 8080으로 정의
 
 ---
 spring:
@@ -571,6 +571,7 @@ spring:
 server:
   port: 8080
 
+```
 #Gateway Deploy 생성 및 Kubernetes에 생성된 Deploy. 확인  
 ![image](https://user-images.githubusercontent.com/84304007/124870391-9e456500-dffd-11eb-8f78-f072bc2f6ab9.png)  
 
