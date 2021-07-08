@@ -754,24 +754,16 @@ kubectl get deployment
 
 * 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
 
-시나리오는 단말앱(app)-->결제(pay) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
+시나리오는 주문(order) -->결제(pay) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
 
 - Hystrix 를 설정:  요청처리 쓰레드에서 처리시간이 300 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
 - 임의의 부하처리를 위해 결제서비스내 sleep을 random하게 적용하였다.
 ```
-# app 서비스, application.yml
+# Order 서비스, application.yml에 추가
 
 feign:
   hystrix:
     enabled: true
-
-# To set thread isolation to SEMAPHORE
-#hystrix:
-#  command:
-#    default:
-#      execution:
-#        isolation:
-#          strategy: SEMAPHORE
 
 hystrix:
   command:
@@ -780,36 +772,22 @@ hystrix:
       execution.isolation.thread.timeoutInMilliseconds: 300
 
 ```
-
-
-* 부하테스터 siege 툴을 통한 서킷 브레이커 동작 확인:
-- 동시사용자 100명
-- 60초 동안 실시
-
-
---> 수정필요 siege옵션에 -v옵션 추가해서 처리해야함.
-임계치 300을 적용했을 때, 확인이 되려면 -v 옵션으로 했어야 함.
+* 동시사용자 1명으로 부하 생성시 정상  
 ```
-siege -c100 -t60S -r10 --content-type "application/json" 'http://localhost:8081/orders POST {"orderId": "11", "orderType": "prime"}'
+siege -c1 -t10S -v --content-type "application/json" 'http://a6fb12afceb3241e5b3cee8a2f04e18c-312668797.ca-central-1.elb.amazonaws.com:8080/orders POST {"roomType": "double", "guest": "ABAB"}'  
+```
+![image](https://user-images.githubusercontent.com/84304007/124883688-8e814d00-e00c-11eb-8e84-8f4e0644b0d2.png)  
 
-defaulting to time-based testing: 60 seconds
 
-{	"transactions":			        1054,
-	"availability":			       84.27,
-	"elapsed_time":			       59.74,
-	"data_transferred":		        0.30,
-	"response_time":		        5.47,
-	"transaction_rate":		       17.64,
-	"throughput":			        0.00,
-	"concurrency":			       96.58,
-	"successful_transactions":	        1054,
-	"failed_transactions":		         258,
-	"longest_transaction":		        8.41,
-	"shortest_transaction":		        0.44
-}
+* 부하테스터 siege 툴을 통한 서킷 브레이커 동작 확인:  
+- 동시사용자 2명으로 부하 생성시 서킷 브레이커 동작 확인  
+```  
+siege -c2 -t10S -v --content-type "application/json" 'http://a6fb12afceb3241e5b3cee8a2f04e18c-312668797.ca-central-1.elb.amazonaws.com:8080/orders POST {"roomType": "double", "guest": "ABAB"}'    
 
 ```
-- 84.27% 성공, 15.73% 실패
+![image](https://user-images.githubusercontent.com/84304007/124883406-419d7680-e00c-11eb-931f-1bb092be6426.png)  
+  
+- 95.83% 성공, 4.27% 실패  
 
 
 
