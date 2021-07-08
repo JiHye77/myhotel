@@ -529,63 +529,9 @@ mvn spring-boot:run
 API gateway 를 통해 MSA 진입점을 통일 시킨다.
 
 ```
-# gateway 기동(8088 포트)
-cd gateway
-mvn spring-boot:run
-
-# api gateway를 통한 twin 타입의 호텔 예약주문
-http localhost:8088/orders roomType=twin name=JHJH
-```
-![image](https://user-images.githubusercontent.com/84304007/124859578-2706d580-dfeb-11eb-8a99-310be38bca4f.png)
-
-
-```
-application.yml
-
-server:
-  port: 8088
+#gateway 스프링부트 App을 추가 후 application.yaml내에 각 마이크로 서비스의 routes 를 추가하고 gateway 서버의 포트를 8080 
 
 ---
-
-spring:
-  profiles: default
-  cloud:
-    gateway:
-      routes:
-        - id: order
-          uri: http://localhost:8081
-          predicates:
-            - Path=/orders/** 
-        - id: reservation
-          uri: http://localhost:8082
-          predicates:
-            - Path=/reservations/** 
-        - id: payment
-          uri: http://localhost:8083
-          predicates:
-            - Path=/payments/** 
-        - id: customer
-          uri: http://localhost:8084
-          predicates:
-            - Path= /mypages/**
-        - id: review
-          uri: http://localhost:8085
-          predicates:
-            - Path=/reviews/** 
-      globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins:
-              - "*"
-            allowedMethods:
-              - "*"
-            allowedHeaders:
-              - "*"
-            allowCredentials: true
-
-
----
-
 spring:
   profiles: docker
   cloud:
@@ -624,6 +570,15 @@ spring:
 
 server:
   port: 8080
+
+#Gateway Deploy 생성 및 Kubernetes에 생성된 Deploy. 확인  
+![image](https://user-images.githubusercontent.com/84304007/124870391-9e456500-dffd-11eb-8f78-f072bc2f6ab9.png)  
+
+#API Gateay 엔드포인트 확인  
+![image](https://user-images.githubusercontent.com/84304007/124870461-bae19d00-dffd-11eb-8cfa-a5a27312d037.png)  
+
+#order 주문 서비스 호출 시 성공 (8080포트)
+![image](https://user-images.githubusercontent.com/84304007/124870526-d51b7b00-dffd-11eb-951c-644728a33f9a.png)
 
 ```
 ## 마이페이지
