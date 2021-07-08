@@ -802,52 +802,27 @@ defaulting to time-based testing: 60 seconds
 
 
 ## 오토스케일 아웃
--앞서 CB 는 시스템을 안정되게 운영할 수 있게 해줬지만 사용자의 요청을 100% 받아들여주지 못했기 때문에 이에 대한 보완책으로 자동화된 확장 기능을 적용하고자 한다.
-#### reservation deployment.yml 파일에 resources 설정을 추가한다 
-![1](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/1.PNG)
+앞서 CB 는 시스템을 안정되게 운영할 수 있게 해줬지만 사용자의 요청을 100% 받아들여주지 못했기 때문에 이에 대한 보완책으로 자동화된 확장 기능을 적용하고자 한다. 
 
-#### reservation 서비스에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 
-설정은 CPU 사용량이 50프로를 넘어서면 replica 를 10개까지 늘려준다:
-kubectl autoscale deployment reservation -n healthcenter --cpu-percent=50 --min=1 --max=10
-```
-root@labs--244363308:/home/project# kubectl autoscale deployment reservation -n healthcenter --cpu-percent=50 --min=1 --max=10
 
-horizontalpodautoscaler.autoscaling/reservation autoscaled
+- 결제서비스에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 15프로를 넘어서면 replica 를 10개까지 늘려준다:
 ```
+kubectl autoscale deploy payment --min=1 --max=10 --cpu-percent=15
+```
+- CB 에서 했던 방식대로 워크로드를 2분 동안 걸어준다.
+```
+siege -c100 -t120S -r10 --content-type "application/json" 'http://a6fb12afceb3241e5b3cee8a2f04e18c-312668797.ca-central-1.elb.amazonaws.com:8080/orders POST {"roomType": "double", "guest": "111"}'
+```
+- 오토스케일이 어떻게 되고 있는지 모니터링을 걸어둔다:
+```
+kubectl get deploy payment -w
+```
+- 어느정도 시간이 흐른 후 (약 30초) 스케일 아웃이 벌어지는 것을 확인할 수 있다: --> 확인 못함
 
-#### 부하를 동시사용자 200명, 1분 동안 걸어준다.
 ```
-root@siege:/# siege –c200 -t60S -v --content-type "application/json" 'http://reservation:8080/reservations POST {"orderId": "12345"}'
-```
-#### 오토스케일이 어떻게 되고 있는지 모니터링을 걸어둔다
-```
-# kubectl get deploy reservation -w -n healthcenter
-```
-
-#### 어느정도 시간이 흐른 후 (약 30초) 스케일 아웃이 벌어지는 것을 확인할 수 있다
-```
-root@labs--244363308:/home/project# kubectl get deploy reservation -w -n healthcenter
-NAME          READY   UP-TO-DATE   AVAILABLE   AGE
-reservation   1/1     1            0           4m24s
-reservation   1/4     1            0           5m12s
-reservation   1/4     1            0           5m12s
-reservation   2/4     1            0           5m12s
-```
---> 수정필요. AVAILABLE이 올라오는지 확인되어야 한다. 
-```
-Lifting the server siege...
-Transactions:                  38354 hits
-Availability:                 100.00 %
-Elapsed time:                  59.76 secs
-Data transferred:               8.56 MB
-Response time:                  0.04 secs
-Transaction rate:             641.80 trans/sec
-Throughput:                     0.14 MB/sec
-Concurrency:                   24.94
-Successful transactions:       38354
-Failed transactions:               0
-Longest transaction:            0.41
-Shortest transaction:           0.00
+root@labs-412292045:/home/project# kubectl get deploy payment -w -n hotelreservation
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+payment   1/1     1            1           139m
 ```
 
 
