@@ -508,6 +508,8 @@ http localhost:8081/orders roomType=double name=LJH   #Success
 # 결제처리
 http localhost:8083/payments orderId=5  #Success  
 
+```
+
 # 주문 상태 확인  
 http localhost:8081/orders/5     
 
@@ -522,7 +524,6 @@ mvn spring-boot:run
 
 ![image](https://user-images.githubusercontent.com/84304007/124858906-e35f9c00-dfe9-11eb-87b7-97313e8fe9a4.png)  
 
-```
 
 ## API 게이트웨이(gateway)
 
@@ -533,8 +534,8 @@ API gateway 를 통해 MSA 진입점을 통일 시킨다.
 cd gateway
 mvn spring-boot:run
 
-# api gateway를 통한 prime 타입의 호텔 예약주문
-http localhost:8080/orders orderType=prime name=jung
+# api gateway를 통한 twin 타입의 호텔 예약주문
+http localhost:8080/orders roomType=twin name=JHJH
 
 HTTP/1.1 201 
 Content-Type: application/json;charset=UTF-8
