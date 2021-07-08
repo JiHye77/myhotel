@@ -250,11 +250,10 @@ http http://localhost:8085/reviews orderId=1 text="Excellent"
 
 # 주문 상태 확인(mypage)
 
-http localhost:8081/orders/3
-root@labs--1428063258:/home/project/myhotel# http http://localhost:8084/mypages/1
+root@labs-412292045:/home/project/myhotel# http localhost:8081/orders/3
 HTTP/1.1 200 
 Content-Type: application/hal+json;charset=UTF-8
-Date: Thu, 08 July 2021 10:43:12 GMT
+Date: Thu, 08 Jul 2021 02:57:15 GMT
 Transfer-Encoding: chunked
 
 {
@@ -301,10 +300,9 @@ Transfer-Encoding: chunked
 # 변경/재기동 후 예약 주문
  http localhost:8081/orders roomType=double name=CJR
  
-HTTP/1.1 201
-Content-Type: application/json;charset=UTF-8
-Date: Tue, 06 Jul 2021 04:38:05 GMT
-Location: http://localhost:8081/orders/2
+HTTP/1.1 201 
+Content-Type: application/hal+json;charset=UTF-8
+Date: Thu, 08 Jul 2021 02:59:28 GMT
 Transfer-Encoding: chunked
 
 {
@@ -325,11 +323,11 @@ Transfer-Encoding: chunked
 
 # 저장이 잘 되었는지 조회
 
-http localhost:8084/mypages/2
+root@labs-412292045:/home/project/myhotel# http localhost:8084/mypages/2
 
-HTTP/1.1 200
+HTTP/1.1 200 
 Content-Type: application/hal+json;charset=UTF-8
-Date: Tue, 06 Jul 2021 04:39:14 GMT
+Date: Thu, 08 Jul 2021 02:59:29 GMT
 Transfer-Encoding: chunked
 
 {
