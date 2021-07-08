@@ -503,60 +503,25 @@ public class PolicyHandler{
 # (reservation)예약 서비스를 잠시 내려놓음 (ctrl+c)
 
 # 주문처리
-http localhost:8081/orders roomType=prime name=jung   #Success
+http localhost:8081/orders roomType=double name=LJH   #Success  
 
 # 결제처리
-http localhost:8083/paymentHistories orderId=3 price=50000 payMethod=cash   #Success
+http localhost:8083/payments orderId=5  #Success  
 
-# 주문 상태 확인
-http localhost:8081/orders/3   
+# 주문 상태 확인  
+http localhost:8081/orders/5     
 
-# 주문상태 안바뀜 확인
-HTTP/1.1 200 
-Content-Type: application/hal+json;charset=UTF-8
-Date: Mon, 21 Jun 2021 12:57:53 GMT
-Transfer-Encoding: chunked
+# 주문상태 안바뀜 확인 : 주문상태 "null"   
+![image](https://user-images.githubusercontent.com/84304007/124858834-c1feb000-dfe9-11eb-90dd-26d5069cdc44.png)  
 
-{
-    "_links": {
-        "order": {
-            "href": "http://localhost:8081/orders/3"
-        },
-        "self": {
-            "href": "http://localhost:8081/orders/3"
-        }
-    },
-    "cardNo": null,
-    "name": "jung",
-    "orderType": "prime",
-    "status": null
-}
-
-# reservation 서비스 기동
+# reservation 서비스 기동  
 cd /home/project/healthcenter/reservation
 mvn spring-boot:run
 
-# 주문상태 확인(mypage) : 주문 상태가 "Reservation Complete"으로 확인
+# 주문상태 확인 : 주문 상태가 "Reserved"으로 확인    
 
-HTTP/1.1 200 
-Content-Type: application/hal+json;charset=UTF-8
-Date: Mon, 21 Jun 2021 13:01:14 GMT
-Transfer-Encoding: chunked
+![image](https://user-images.githubusercontent.com/84304007/124858906-e35f9c00-dfe9-11eb-87b7-97313e8fe9a4.png)  
 
-{
-    "_links": {
-        "mypage": {
-            "href": "http://localhost:8084/mypages/5"
-        },
-        "self": {
-            "href": "http://localhost:8084/mypages/5"
-        }
-    },
-    "name": "jung",
-    "orderId": 3,
-    "reservationId": 2,
-    "status": "Reservation Complete"
-}
 ```
 
 ## API 게이트웨이(gateway)
