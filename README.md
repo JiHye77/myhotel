@@ -401,58 +401,22 @@ public interface PaymentService {
     }
 ```
 
-- 동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하며, 결제 시스템이 장애가 나면 주문도 못받는다는 것을 확인:  --> 해야됨   
+- 동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하며, 결제 시스템이 장애가 나면 주문도 못받는다는 것을 확인:     
 ```
 # 결제 (payment) 서비스를 잠시 내려놓음 (ctrl+c) 
+```
 
-#주문처리
- http localhost:8081/orders roomType=prime name=jung
-
-#Fail
-HTTP/1.1 500 
-Connection: close
-Content-Type: application/json;charset=UTF-8
-Date: Mon, 21 Jun 2021 12:45:45 GMT
-Transfer-Encoding: chunked
-
-{
-    "error": "Internal Server Error",
-    "message": "Could not commit JPA transaction; nested exception is javax.persistence.RollbackException: Error while committing the transaction",
-    "path": "/orders",
-    "status": 500,
-    "timestamp": "2021-06-21T12:45:45.797+0000"
-}
+#주문처리 후, Fail error 확인
+![image](https://user-images.githubusercontent.com/84304007/124857377-279d6d00-dfe7-11eb-9e8d-2c5641524413.png)
 
 
 #결제서비스 재기동
 cd /home/project/myhotel/payment  
 mvn spring-boot:run
 
-#주문처리
-http localhost:8081/orders orderType=prime name=jung
+#주문처리 후, 주문 성공(Success)
+![image](https://user-images.githubusercontent.com/84304007/124857622-98448980-dfe7-11eb-8d9e-cc33ab5f1440.png)
 
-#Success
-HTTP/1.1 201 
-Content-Type: application/json;charset=UTF-8
-Date: Mon, 21 Jun 2021 12:47:48 GMT
-Location: http://localhost:8081/orders/2
-Transfer-Encoding: chunked
-
-{
-    "_links": {
-        "order": {
-            "href": "http://localhost:8081/orders/2"
-        },
-        "self": {
-            "href": "http://localhost:8081/orders/2"
-        }
-    },
-    "cardNo": null,
-    "name": "jung",
-    "orderType": "prime",
-    "status": null
-}
-```
 
 ## 비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트
 
