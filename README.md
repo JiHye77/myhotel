@@ -298,11 +298,11 @@ Transfer-Encoding: chunked
 		</dependency>
 
 # 변경/재기동 후 예약 주문
- http localhost:8081/orders roomType=double name=CJR
+root@labs-412292045:/home/project/myhotel# http localhost:8081/orders roomType=double name=CJR
  
 HTTP/1.1 201 
 Content-Type: application/hal+json;charset=UTF-8
-Date: Thu, 08 Jul 2021 02:59:28 GMT
+Date: Thu, 08 Jul 2021 02:59:25 GMT
 Transfer-Encoding: chunked
 
 {
@@ -327,7 +327,7 @@ root@labs-412292045:/home/project/myhotel# http localhost:8084/mypages/2
 
 HTTP/1.1 200 
 Content-Type: application/hal+json;charset=UTF-8
-Date: Thu, 08 Jul 2021 02:59:29 GMT
+Date: Thu, 08 Jul 2021 02:59:58 GMT
 Transfer-Encoding: chunked
 
 {
