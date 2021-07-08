@@ -768,11 +768,17 @@ mvn clean package -B
 kubectl create namespace hotelreservation
 kubectl config set-context --current --namespace=hotelreservation
 ```
-###### EKS에 마이크로서비스 배포, order/payment/reservation/customer/review/gateway 각각 실행
+###### EKS에 마이크로서비스 배포, order/payment/reservation/customer/review 각각 실행
 ```sh
 kubectl create deploy order --image=879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-order:v1 -n hotelreservation  
 kubectl expose deploy order --type="ClusterIP" --port=8080 --namespace=hotelreservation  
+
+#Gateway는 LoadBalancer type으로 실행  
+
+kubectl create deploy gateway --image=879772956301.dkr.ecr.ca-central-1.amazonaws.com/user17-gateway:v1 -n hotelreservation  
+kubectl expose deploy gateway --type="LoadBalancer" --port=8080 --namespace=hotelreservation   
 ```
+
 ###### 마이크로서비스 배포 상태 확인
 ```sh
 kubectl get pods  
