@@ -279,7 +279,7 @@ Transfer-Encoding: chunked
 비지니스 로직은 내부에 순수한 형태로 구현
 그 이외의 것을 어댑터 형식으로 설계 하여 해당 비지니스 로직이 어느 환경에서도 잘 도착하도록 설계
 
-![polyglot](https://user-images.githubusercontent.com/76020494/108794206-b07fb300-75c8-11eb-9f97-9a4e1695588c.png)
+![image](https://user-images.githubusercontent.com/84304007/124892969-49154d80-e015-11eb-8a4e-b46f3e4a988b.png)
 
 폴리그랏 퍼시스턴스 요건을 만족하기 위해 기존 h2를 hsqldb로 변경 (order서비스의 pom.xml)
 
