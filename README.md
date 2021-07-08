@@ -406,15 +406,15 @@ public interface PaymentService {
 # 결제 (payment) 서비스를 잠시 내려놓음 (ctrl+c) 
 ```
 
-### 주문처리 후, Fail error 확인
+#주문처리 후, Fail error 확인
 ![image](https://user-images.githubusercontent.com/84304007/124857377-279d6d00-dfe7-11eb-9e8d-2c5641524413.png)
 
 
-### 결제서비스 재기동
+#결제서비스 재기동
 cd /home/project/myhotel/payment  
 mvn spring-boot:run  
 
-### 주문처리 후, 주문 성공(Success)
+#주문처리 후, 주문 성공(Success)
 ![image](https://user-images.githubusercontent.com/84304007/124857622-98448980-dfe7-11eb-8d9e-cc33ab5f1440.png)
 
 
@@ -746,48 +746,6 @@ kubectl get pods
 kubectl get deployment  
 ```
 ![image](https://user-images.githubusercontent.com/84304007/124867641-70f6b800-dff9-11eb-8af5-029fd44b2147.png)
-
-
-##### 마이크로서비스 동작 테스트
-###### 포트 포워딩
-kubectl port-forward deploy/order 8081:8080
-
-kubectl port-forward deploy/payment 8083:8080
-
-kubectl port-forward deploy/reservation 8082:8080
-
-kubectl port-forward deploy/notification 8084:8080
-
-###### 서비스 확인
-```sh
-root@labs--377686466:/home/project# http http://localhost:8081/orders
-HTTP/1.1 200 
-Content-Type: application/hal+json;charset=UTF-8
-Date: Tue, 22 Jun 2021 01:38:32 GMT
-Transfer-Encoding: chunked
-
-{
-    "_embedded": {
-        "orders": []
-    },
-    "_links": {
-        "profile": {
-            "href": "http://localhost:8081/profile/orders"
-        },
-        "self": {
-            "href": "http://localhost:8081/orders{?page,size,sort}",
-            "templated": true
-        }
-    },
-    "page": {
-        "number": 0,
-        "size": 20,
-        "totalElements": 0,
-        "totalPages": 0
-    }
-}
-```
-
 
 
 ## 동기식 호출 / Circuit Breaker
