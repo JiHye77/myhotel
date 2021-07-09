@@ -867,7 +867,7 @@ root@labs-412292045:/home/project# siege -c100 -t60S -r10 -v --content-type "app
 ## Self Healing(Liveness Probe)
 - deployment.yml 을 /tmp/healthy 파일을 만들고 90초 후 삭제 후 
 livenessProbe에 /tmp/healthy 파일이 존재하는지 재확인하는 설정값을 추가
-- periodSeconds 값으로 3초마다/tmp/healthy 파일의 존재 여부를 조회
+- periodSeconds 값으로 5초마다/tmp/healthy 파일의 존재 여부를 조회
 - 파일이 존재하지 않을 경우, 정상 작동에 문제가 있다고 판단되어 kubelet에 의해 자동으로 컨테이너가 재시작
 
 #### review deployment.yml 파일 수정
@@ -880,7 +880,7 @@ livenessProbe에 /tmp/healthy 파일이 존재하는지 재확인하는 설정�
 ```
 ![image](https://user-images.githubusercontent.com/84304007/124918927-905d0780-e030-11eb-900a-9e5b5e49acc1.png)  
 
-- 컨테이너 실행 후 90초 동인은 정상이나 이후 /tmp/healthy 파일이 삭제되어 livenessProbe에서 실패를 리턴하게 되고, pod 정상 상태 일 때 pod 진입하여 /tmp/healthy 파일 생성해주면 정상 상태 유지 확인
+- 컨테이너 실행 후 90초 동인은 정상이나 이후 /tmp/healthy 파일이 삭제되어 livenessProbe에서 실패를 리턴하게 되고, pod 정상 상태 일 때 pod 진입하여 /tmp/healthy 파일 생성해주면 정상 상태 유지 확인 --> 확인 못함
 
 ```
 # kubectl get po –n healthcenter –w
