@@ -837,8 +837,6 @@ defaulting to time-based testing: 60 seconds
 
 
 
-
-
 ## 오토스케일 아웃
 앞서 CB 는 시스템을 안정되게 운영할 수 있게 해줬지만 사용자의 요청을 100% 받아들여주지 못했기 때문에 이에 대한 보완책으로 자동화된 확장 기능을 적용하고자 한다. 
 
@@ -855,7 +853,7 @@ siege -c100 -t120S -r10 --content-type "application/json" 'http://a6fb12afceb324
 ```
 kubectl get deploy payment -w
 ```
-- 어느정도 시간이 흐른 후 (약 30초) 스케일 아웃이 벌어지는 것을 확인할 수 있다: --> 확인 못함
+- 어느정도 시간이 흐른 후 스케일 아웃이 벌어지는 것을 확인할 수 있다: --> 확인 못함
 
 ```
 root@labs-412292045:/home/project# kubectl get deploy payment -w -n hotelreservation
