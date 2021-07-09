@@ -68,8 +68,8 @@ Final Project AWS 3차수 - 이지혜
  - http://www.msaez.io/#/storming/ZI0N0eczMndHZbfdoWRoAVzzp4Q2/mine/fca5d4a029e24554953cdc46b01e5422
 ![ver1](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/storming_1.JPG)
 
-#### ver2 - relation정의
-![ver2](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/storming_2.JPG)
+#### ver2 - relation정의  
+![image](https://user-images.githubusercontent.com/84304007/125014197-3861e780-e0a8-11eb-9f73-5b86a02edeb0.png)  
 
 #### ver3 - attribute생성
 ![image](https://user-images.githubusercontent.com/84304007/124426010-5aa3ee80-dda4-11eb-9eaa-87b07bd30491.png)
