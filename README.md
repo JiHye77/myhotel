@@ -127,9 +127,10 @@ mvn spring-boot:run
 netstat -anlp | grep :808  
 ```
 
-## DDD 의 적용
+## DDD (Domain Driven Design) 의 적용
 
-- 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다: 
+- 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다  
+- 업무 영역을 Biz. 중심으로 쪼개서 design함  
 - (예시는 order 마이크로 서비스).
 ```
 package hotelreservation;
@@ -225,9 +226,16 @@ public class Order {
 ```
 package hotelreservation;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
+import java.util.Optional;
 
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+
+@RepositoryRestResource(collectionResourceRel="orders", path="orders")
 public interface OrderRepository extends PagingAndSortingRepository<Order, Long>{
+
+    Optional<Order> findById(Long id);
+
 }
 
 ```
@@ -279,7 +287,7 @@ Transfer-Encoding: chunked
 
 ![image](https://user-images.githubusercontent.com/84304007/124892969-49154d80-e015-11eb-8a4e-b46f3e4a988b.png)
 
-폴리그랏 퍼시스턴스 요건을 만족하기 위해 기존 h2를 hsqldb로 변경 (order서비스의 pom.xml)
+폴리그랏 퍼시스턴스 요건을 만족하기 위해 DB 변경 (기존 h2를 hsqldb로 변경): order서비스의 pom.xml에서 적용해 보았음.   
 
 ```
 <!--		<dependency>-->
@@ -349,7 +357,8 @@ Transfer-Encoding: chunked
 
 ## 동기식 호출 과 Fallback 처리
 
-분석단계에서의 조건 중 하나로 주문(app)->결제(pay) 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다. 호출 프로토콜은 이미 앞서 Rest Repository 에 의해 노출되어있는 REST 서비스를 FeignClient 를 이용하여 호출하도록 한다. 
+분석단계에서의 조건 중 하나로 주문(order)->결제(pay) 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다.  
+호출 프로토콜은 이미 앞서 Rest Repository 에 의해 노출되어있는 REST 서비스를 FeignClient 를 이용하여 호출하도록 한다. 
 
 - 결제서비스를 호출하기 위하여 Stub과 (FeignClient) 를 이용하여 Service 대행 인터페이스 (Proxy) 를 구현 
 ```
