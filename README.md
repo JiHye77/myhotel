@@ -27,7 +27,7 @@ Final Project AWS 3차수 - 이지혜
     - [ConfigMap / Persistence Volume](#Config-Map/Persistence-Volume) 
 
 
-## 시나리오
+## 시나리오  
 
 호텔 예약 시스템에서 요구하는 기능/비기능 요구사항은 다음과 같습니다. 
 사용자가 호텔 예약 시 결제를 진행하면
@@ -843,50 +843,13 @@ payment   1/1     1            1           139m
 
 ## 무정지 배포(Readiness Probe)
 
-- 무정지 배포전 payment서비스의 replic를 3개로 확장하고 각 서비스의 STATUS가 Running 및 1/1 인 것을 확인한다.
+- 무정지 배포전 payment서비스의 replic를 3개로 확장.  
 ```
 kubectl autoscale deploy payment --min=1 --max=3 --cpu-percent=15
 ```
 #### Readiness 설정 
 ![2](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/2.PNG)
--	Readiness 설정 내용 확인
-```
-kubectl describe deploy payment -n hotelreservation
-Name:                   payment
-Namespace:              hotelreservation
-CreationTimestamp:      Mon, 09 Jul 2021 10:02:37 +0000
-Labels:                 app=order
-Annotations:            deployment.kubernetes.io/revision: 1
-Selector:               app=payment
-Replicas:               1 desired | 1 updated | 1 total | 0 available | 1 unavailable
-StrategyType:           RollingUpdate
-MinReadySeconds:        0
-RollingUpdateStrategy:  25% max unavailable, 25% max surge
-Pod Template:
-  Labels:  app=payment
-  Containers:
-   payment:
-    Image:      879772956301.dkr.ecr.ca-central-1.amazonaws.com/payment:v1
-    Port:       8080/TCP
-    Host Port:  0/TCP
-    Limits:
-      cpu:  500m
-    Requests:
-      cpu:        200m
-    Liveness:     http-get http://:8080/actuator/health delay=120s timeout=2s period=5s #success=1 #failure=5
-    Readiness:    http-get http://:8080/actuator/health delay=10s timeout=2s period=5s #success=1 #failure=10   #<---적용됨 확인
-    Environment:  <none>
-    Mounts:       <none>
-  Volumes:        <none>
-Conditions:
-  Type           Status  Reason
-  ----           ------  ------
-  Available      False   MinimumReplicasUnavailable
-  Progressing    False   ProgressDeadlineExceeded
-OldReplicaSets:  <none>
-NewReplicaSet:   payment-55f44fbc85 (1/1 replicas created)
-Events:          <none>
-```
+
 
 #### 부하테스트 siege pod 설치 및 실행
 
@@ -894,20 +857,11 @@ Events:          <none>
 그 사이 새로운 image 를 반영후 deployment.yml을 배포
 Siege 로그를 보면서 배포 시 무정지로 배포되는 것을 확인.
 ```
-root@siege:/# siege -c1 -t60S -v http://payment:8080/payment   ==> 60초 설정
-```
-```
-HTTP/1.1 200     0.01 secs:    6788 bytes ==> GET  /payment
-HTTP/1.1 200     0.01 secs:    6788 bytes ==> GET  /payment
-HTTP/1.1 200     0.00 secs:    6788 bytes ==> GET  /payment
-HTTP/1.1 200     0.01 secs:    6788 bytes ==> GET  /payment
-HTTP/1.1 200     0.00 secs:    6788 bytes ==> GET  /payment
+siege -c100 -t60S -r10 -v --content-type "application/json" 'http://a6fb12afceb3241e5b3cee8a2f04e18c-312668797.ca-central-1.elb.amazonaws.com:8080/payments POST {"cardNo": "123"}'  --> 
 
-Lifting the server siege...
-Transactions:                   8247 hits
-Availability:                 100.00 %
-Elapsed time:                  59.27 secs
 ```
+![image](https://user-images.githubusercontent.com/84304007/125018487-2b48f680-e0b0-11eb-913d-e651f3162441.png)  
+
 
 
 ## Self Healing(Liveness Probe)
