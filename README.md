@@ -928,252 +928,25 @@ EFS 생성 시 클러스터의 VPC를 선택해야함
 ![image](https://user-images.githubusercontent.com/84304007/124917729-209a4d00-e02f-11eb-8956-40f90790ff11.png)  
 
 2. EFS 계정 생성 및 ROLE 바인딩
-```
-kubectl apply -f efs-sa.yml
-
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: efs-provisioner
-  namespace: hotelreservation
-
-
-kubectl get ServiceAccount efs-provisioner -n hotelreservation
-NAME              SECRETS   AGE
-efs-provisioner   1         101s
-  
-  
-  
-kubectl apply -f efs-rbac.yaml
-  
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: efs-provisioner-runner
-  namespace: hotelreservation
-rules:
-  - apiGroups: [""]
-    resources: ["persistentvolumes"]
-    verbs: ["get", "list", "watch", "create", "delete"]
-  - apiGroups: [""]
-    resources: ["persistentvolumeclaims"]
-    verbs: ["get", "list", "watch", "update"]
-  - apiGroups: ["storage.k8s.io"]
-    resources: ["storageclasses"]
-    verbs: ["get", "list", "watch"]
-  - apiGroups: [""]
-    resources: ["events"]
-    verbs: ["create", "update", "patch"]
----
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: run-efs-provisioner
-  namespace: hotelreservation
-subjects:
-  - kind: ServiceAccount
-    name: efs-provisioner
-     # replace with namespace where provisioner is deployed
-    namespace: hotelreservation
-roleRef:
-  kind: ClusterRole
-  name: efs-provisioner-runner
-  apiGroup: rbac.authorization.k8s.io
----
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: leader-locking-efs-provisioner
-  namespace: hotelreservation
-rules:
-  - apiGroups: [""]
-    resources: ["endpoints"]
-    verbs: ["get", "list", "watch", "create", "update", "patch"]
----
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: leader-locking-efs-provisioner
-  namespace: hotelreservation
-subjects:
-  - kind: ServiceAccount
-    name: efs-provisioner
-    # replace with namespace where provisioner is deployed
-    namespace: hotelreservation
-roleRef:
-  kind: Role
-  name: leader-locking-efs-provisioner
-  apiGroup: rbac.authorization.k8s.io
-
-
-```
 
 3. EFS Provisioner 배포
-```
-kubectl apply -f efs-provisioner-deploy.yml
 
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: efs-provisioner
-  namespace: hotelreservation
-spec:
-  replicas: 1
-  strategy:
-    type: Recreate
-  selector:
-    matchLabels:
-      app: efs-provisioner
-  template:
-    metadata:
-      labels:
-        app: efs-provisioner
-    spec:
-      serviceAccount: efs-provisioner
-      containers:
-        - name: efs-provisioner
-          image: quay.io/external_storage/efs-provisioner:latest
-          env:
-            - name: FILE_SYSTEM_ID
-              value: fs-f51c1b18
-            - name: AWS_REGION
-              value: ca-central-1
-            - name: PROVISIONER_NAME
-              value: my-aws.com/aws-efs
-          volumeMounts:
-            - name: pv-volume
-              mountPath: /persistentvolumes
-      volumes:
-        - name: pv-volume
-          nfs:
-            server: fs-f51c1b18.efs.ca-central-1.amazonaws.com
-            path: /
-
-
-kubectl get Deployment efs-provisioner -n hotelreservation
-NAME              READY   UP-TO-DATE   AVAILABLE   AGE
-efs-provisioner   1/1     1            1           24s
-
-```
 
 4. 설치한 Provisioner를 storageclass에 등록
-```
-kubectl apply -f efs-storageclass.yml
 
-
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: aws-efs
-  namespace: hotelreservation
-provisioner: my-aws.com/aws-efs
-
-
-kubectl get sc aws-efs -n hotelreservation
-NAME      PROVISIONER          RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
-aws-efs   my-aws.com/aws-efs   Delete          Immediate           false                  19s
-```
 
 5. PVC(PersistentVolumeClaim) 생성
-```
-kubectl apply -f volume-pvc.yml
 
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: aws-efs
-  namespace: hotelreservation
-  labels:
-    app: test-pvc
-spec:
-  accessModes:
-  - ReadWriteMany
-  resources:
-    requests:
-      storage: 6Ki
-  storageClassName: aws-efs
-  
-  
-kubectl get pvc aws-efs -n hotelreservation
-NAME      STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-aws-efs   Bound    pvc-ed77965e-80ac-4a6a-b721-1e54a867f2e6   6Ki        RWX            aws-efs        142m
-```
 
 6. order pod 적용
-```
-kubectl apply -f deployment.yml
-```   
+
 
 7. A pod에서 마운트된 경로에 파일을 생성하고 B pod에서 파일을 확인함
-```
-NAME                              READY   STATUS    RESTARTS   AGE
-efs-provisioner-f4f7b5d64-lt7rz   1/1     Running   0          14m
-order-574f9b746-q6fkb             1/1     Running   0          109s
-order-574f9b746-pl25l             1/1     Running   0          109s
-siege                             1/1     Running   0          2d1h
-
-
-kubectl exec -it pod/order-574f9b746-q6fkb order -n hotelreservation -- /bin/sh
-/ # cd /mnt/aws
-/mnt/aws # touch final_test
-```
-
-```
-kubectl exec -it pod/order-574f9b746-pl25l order -n hotelreservation -- /bin/sh
-/ # cd /mnt/aws
-/mnt/aws # ls -al
-total 8
-drwxrws--x    2 root     2000          6144 Jul 09 09:22 .
-drwxr-xr-x    1 root     root            17 Jul 09 09:22 ..
--rw-r--r--    1 root     2000             0 Jul 08 09:31 final_test
-```
 
 
 #### Config Map
 
 1: configmap.yml 파일 생성
-```
-kubectl apply -f configmap.yml
 
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: hotelreservation-config
-  namespace: hotelreservation
-data:
-  # 단일 key-value
-  max_reservation_per_person: "10"
-  ui_properties_file_name: "user-interface.properties"
-```
 
 2. deployment.yml에 적용하기
-
-```
-kubectl apply -f deployment.yml
-
-
-.......
-          env:
-			# cofingmap에 있는 단일 key-value
-            - name: MAX_RESERVATION_PER_PERSION
-              valueFrom:
-                configMapKeyRef:
-                  name: hotelreservation-config
-                  key: max_reservation_per_person
-           - name: UI_PROPERTIES_FILE_NAME
-              valueFrom:
-                configMapKeyRef:
-                  name: hotelreservation-config
-                  key: ui_properties_file_name
-          volumeMounts:
-          - mountPath: "/mnt/aws"
-            name: volume
-      volumes:
-        - name: volume
-          persistentVolumeClaim:
-            claimName: aws-efs
-```
-
-과정 따라 했으나, 결과 확인 못함..
