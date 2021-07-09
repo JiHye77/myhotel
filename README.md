@@ -65,14 +65,15 @@ Final Project AWS 3차수 - 이지혜
 
 #### ver1 - 이벤트도출
  - MSAEZ 툴에서 이벤트스토밍 작업
- - http://www.msaez.io/#/storming/ZI0N0eczMndHZbfdoWRoAVzzp4Q2/mine/fca5d4a029e24554953cdc46b01e5422
-![ver1](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/storming_1.JPG)
+![image](https://user-images.githubusercontent.com/84304007/125014364-8b3b9f00-e0a8-11eb-956a-6a74cd37b0a5.png)  
 
 #### ver2 - relation정의  
 ![image](https://user-images.githubusercontent.com/84304007/125014197-3861e780-e0a8-11eb-9f73-5b86a02edeb0.png)  
 
 #### ver3 - attribute생성
-![image](https://user-images.githubusercontent.com/84304007/124426010-5aa3ee80-dda4-11eb-9eaa-87b07bd30491.png)
+![image](https://user-images.githubusercontent.com/84304007/124426010-5aa3ee80-dda4-11eb-9eaa-87b07bd30491.png)  
+
+ - http://www.msaez.io/#/storming/ZI0N0eczMndHZbfdoWRoAVzzp4Q2/mine/fca5d4a029e24554953cdc46b01e5422  
 
 ### 기능 요구사항을 커버하는지 검증
 1. 고객이 원하는 일자를 선택하고 예약한다.  -> O
