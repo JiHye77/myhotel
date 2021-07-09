@@ -809,7 +809,7 @@ kubectl get deployment
 siege -c100 -t60S -v --content-type "application/json" 'http://a6fb12afceb3241e5b3cee8a2f04e18c-312668797.ca-central-1.elb.amazonaws.com:8080/orders POST {"roomType": "double", "guest": "111"}'    
 
 ```
- ![image](https://user-images.githubusercontent.com/84304007/125008779-31ce7280-e09e-11eb-9bc7-2655a198d3e1.png)  
+![image](https://user-images.githubusercontent.com/84304007/125009210-05ffbc80-e09f-11eb-803c-93477cb711be.png)  
  
  성공 251, 실패 317건 발생  
 
@@ -842,7 +842,7 @@ payment   1/1     1            1           139m
 
 ## 무정지 배포(Readiness Probe)
 
-- 무정지 배포전 payment 서비스의 replic를 3개로 확장하고 각 서비스의 STATUS가 Running 및 1/1 인 것을 확인한다.
+<!-- - 무정지 배포전 payment 서비스의 replic를 3개로 확장하고 각 서비스의 STATUS가 Running 및 1/1 인 것을 확인한다.
 ```
 root@labs--244363308:/home/project# kubectl get pod
 NAME                           READY   STATUS             RESTARTS   AGE
@@ -919,7 +919,7 @@ Transactions:                   9379 hits
 Availability:                 100.00 %
 Elapsed time:                  59.27 secs
 ```
-
+ -->
 
 ## Self Healing(Liveness Probe)
 - deployment.yml 을 /tmp/healthy 파일을 만들고 90초 후 삭제 후 
@@ -956,7 +956,7 @@ siege                         1/1     Running   0          79m
 siege-5c7c46b788-9w5l5        1/1     Running   0          4h21m
 
 
-* 아래와 같은 유사한 결과가 나와야 하나 확인 못함..
+* 아래와 같은 형태의 결과가 나와야 하나 확인 못함..
 
 NAME                              READY   STATUS              RESTARTS   AGE
 efs-provisioner-f4f7b5d64-zfkpg   0/1     ContainerCreating   0          39m
@@ -987,29 +987,27 @@ EFS 생성 시 클러스터의 VPC를 선택해야함
 2. EFS 계정 생성 및 ROLE 바인딩
 ```
 kubectl apply -f efs-sa.yml
-!(https://github.com/JiHye77/AWS3_healthcenter/blob/main/refer/3.%20efs-sa.JPG)
 
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: efs-provisioner
-  namespace: healthcenter
+  namespace: hotelreservation
 
 
-kubectl get ServiceAccount efs-provisioner -n healthcenter
+kubectl get ServiceAccount efs-provisioner -n hotelreservation
 NAME              SECRETS   AGE
 efs-provisioner   1         101s
   
   
   
 kubectl apply -f efs-rbac.yaml
-!(https://github.com/JiHye77/AWS3_healthcenter/blob/main/refer/4%20efs_rbac.JPG)
   
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: efs-provisioner-runner
-  namespace: healthcenter
+  namespace: hotelreservation
 rules:
   - apiGroups: [""]
     resources: ["persistentvolumes"]
@@ -1028,12 +1026,12 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: run-efs-provisioner
-  namespace: healthcenter
+  namespace: hotelreservation
 subjects:
   - kind: ServiceAccount
     name: efs-provisioner
      # replace with namespace where provisioner is deployed
-    namespace: healthcenter
+    namespace: hotelreservation
 roleRef:
   kind: ClusterRole
   name: efs-provisioner-runner
@@ -1043,7 +1041,7 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: leader-locking-efs-provisioner
-  namespace: healthcenter
+  namespace: hotelreservation
 rules:
   - apiGroups: [""]
     resources: ["endpoints"]
@@ -1053,12 +1051,12 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: leader-locking-efs-provisioner
-  namespace: healthcenter
+  namespace: hotelreservation
 subjects:
   - kind: ServiceAccount
     name: efs-provisioner
     # replace with namespace where provisioner is deployed
-    namespace: healthcenter
+    namespace: hotelreservation
 roleRef:
   kind: Role
   name: leader-locking-efs-provisioner
@@ -1070,13 +1068,12 @@ roleRef:
 3. EFS Provisioner 배포
 ```
 kubectl apply -f efs-provisioner-deploy.yml
-!(https://github.com/JiHye77/AWS3_healthcenter/blob/main/refer/5%20proviosioner.JPG)
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: efs-provisioner
-  namespace: healthcenter
+  namespace: hotelreservation
 spec:
   replicas: 1
   strategy:
@@ -1095,9 +1092,9 @@ spec:
           image: quay.io/external_storage/efs-provisioner:latest
           env:
             - name: FILE_SYSTEM_ID
-              value: fs-562f9c36
+              value: fs-f51c1b18
             - name: AWS_REGION
-              value: ap-northeast-2
+              value: ca-central-1
             - name: PROVISIONER_NAME
               value: my-aws.com/aws-efs
           volumeMounts:
@@ -1106,11 +1103,11 @@ spec:
       volumes:
         - name: pv-volume
           nfs:
-            server: fs-562f9c36.efs.ap-northeast-2.amazonaws.com
+            server: fs-f51c1b18.efs.ca-central-1.amazonaws.com
             path: /
 
 
-kubectl get Deployment efs-provisioner -n healthcenter
+kubectl get Deployment efs-provisioner -n hotelreservation
 NAME              READY   UP-TO-DATE   AVAILABLE   AGE
 efs-provisioner   1/1     1            1           24s
 
@@ -1125,11 +1122,11 @@ kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
   name: aws-efs
-  namespace: healthcenter
+  namespace: hotelreservation
 provisioner: my-aws.com/aws-efs
 
 
-kubectl get sc aws-efs -n healthcenter
+kubectl get sc aws-efs -n hotelreservation
 NAME      PROVISIONER          RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
 aws-efs   my-aws.com/aws-efs   Delete          Immediate           false                  19s
 ```
@@ -1143,7 +1140,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: aws-efs
-  namespace: healthcenter
+  namespace: hotelreservation
   labels:
     app: test-pvc
 spec:
@@ -1155,7 +1152,7 @@ spec:
   storageClassName: aws-efs
   
   
-kubectl get pvc aws-efs -n healthcenter
+kubectl get pvc aws-efs -n hotelreservation
 NAME      STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
 aws-efs   Bound    pvc-ed77965e-80ac-4a6a-b721-1e54a867f2e6   6Ki        RWX            aws-efs        142m
 ```
@@ -1163,9 +1160,7 @@ aws-efs   Bound    pvc-ed77965e-80ac-4a6a-b721-1e54a867f2e6   6Ki        RWX    
 6. order pod 적용
 ```
 kubectl apply -f deployment.yml
-```
-![pod with pvc](https://github.com/JiHye77/AWS3_healthcenter/blob/main/refer/6%20room%20pod.JPG)
-
+```   
 
 7. A pod에서 마운트된 경로에 파일을 생성하고 B pod에서 파일을 확인함
 ```
@@ -1176,19 +1171,19 @@ order-574f9b746-pl25l             1/1     Running   0          109s
 siege                             1/1     Running   0          2d1h
 
 
-kubectl exec -it pod/order-574f9b746-q6fkb order -n healthcenter -- /bin/sh
+kubectl exec -it pod/order-574f9b746-q6fkb order -n hotelreservation -- /bin/sh
 / # cd /mnt/aws
 /mnt/aws # touch final_test
 ```
 
 ```
-kubectl exec -it pod/order-574f9b746-pl25l order -n healthcenter -- /bin/sh
+kubectl exec -it pod/order-574f9b746-pl25l order -n hhotelreservation -- /bin/sh
 / # cd /mnt/aws
 /mnt/aws # ls -al
 total 8
-drwxrws--x    2 root     2000          6144 Jun 21 00:22 .
-drwxr-xr-x    1 root     root            17 Jun 21 00:22 ..
--rw-r--r--    1 root     2000             0 Jun 21 01:31 final_test
+drwxrws--x    2 root     2000          6144 Jul 09 09:22 .
+drwxr-xr-x    1 root     root            17 Jul 09 09:22 ..
+-rw-r--r--    1 root     2000             0 Jul 08 09:31 final_test
 ```
 
 
@@ -1202,8 +1197,8 @@ kubectl apply -f configmap.yml
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: healthcenter-config
-  namespace: healthcenter
+  name: hotelreservation-config
+  namespace: hotelreservation
 data:
   # 단일 key-value
   max_reservation_per_person: "10"
@@ -1222,12 +1217,12 @@ kubectl apply -f deployment.yml
             - name: MAX_RESERVATION_PER_PERSION
               valueFrom:
                 configMapKeyRef:
-                  name: healthcenter-config
+                  name: hotelreservation-config
                   key: max_reservation_per_person
            - name: UI_PROPERTIES_FILE_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: healthcenter-config
+                  name: hotelreservation-config
                   key: ui_properties_file_name
           volumeMounts:
           - mountPath: "/mnt/aws"
@@ -1238,38 +1233,4 @@ kubectl apply -f deployment.yml
             claimName: aws-efs
 ```
 
-3. ENV 적용결과 확인 
-```
-root@labs--377686466:/home/project# kubectl exec order-574f9b746-q6fkb -it -- sh
-/ # env
-RESERVATION_SERVICE_HOST=10.100.93.168
-RESERVATION_PORT_8080_TCP_ADDR=10.100.93.168
-KUBERNETES_PORT=tcp://10.100.0.1:443
-KUBERNETES_SERVICE_PORT=443
-UI_PROPERTIES_FILE_NAME=user-interface.properties
-NOTIFICATION_PORT_8080_TCP=tcp://10.100.65.88:8080
-ORDER_PORT_80_TCP_ADDR=10.100.61.51
-JAVA_ALPINE_VERSION=8.212.04-r0
-HOSTNAME=order-574f9b746-q6fkb
-RESERVATION_PORT_8080_TCP_PORT=8080
-RESERVATION_PORT_8080_TCP_PROTO=tcp
-SHLVL=1
-ORDER_PORT_80_TCP_PORT=80
-HOME=/root
-ORDER_PORT_80_TCP_PROTO=tcp
-RESERVATION_SERVICE_PORT=8080
-RESERVATION_PORT=tcp://10.100.93.168:8080
-PAYMENT_SERVICE_HOST=10.100.208.81
-PAYMENT_PORT_8080_TCP_ADDR=10.100.208.81
-RESERVATION_PORT_8080_TCP=tcp://10.100.93.168:8080
-JAVA_VERSION=8u212
-ORDER_PORT_80_TCP=tcp://10.100.61.51:80
-PAYMENT_PORT_8080_TCP_PORT=8080
-PAYMENT_PORT_8080_TCP_PROTO=tcp
-TERM=xterm
-MAX_RESERVATION_PER_PERSION=10                                #<--- 적용
-PAYMENT_SERVICE_PORT=8080
-KUBERNETES_PORT_443_TCP_ADDR=10.100.0.1
-```
-
---> 수정필요. 해당 설정을 마이크로서비스에서 활용하여 로그라도 찍었어야 함..
+결과 확인 못함..
