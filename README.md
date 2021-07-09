@@ -281,6 +281,37 @@ Transfer-Encoding: chunked
 
 ```
 
+## Correlation/CQRS 적용
+PolicyHandler에서 처리 시 어떤 건에 대한 처리인지를 구별하기 위한 Correlation-key 구현을 
+이벤트 클래스 안의 변수로 전달받아 서비스간 연관된 처리를 정확하게 구현하고 있습니다. 
+
+아래의 구현 예제를 보면
+
+예약(Reservation)을 하면 동시에 연관된 방(Room), 결제(Payment) 등의 서비스의 상태가 적당하게 변경이 되고,
+예약건의 취소를 수행하면 다시 연관된 방(Room), 결제(Payment) 등의 서비스의 상태값 등의 데이터가 적당한 상태로 변경되는 것을
+확인할 수 있습니다. 
+
+1) 고객이 호텔 예약  
+![image](https://user-images.githubusercontent.com/84304007/125005859-c386b180-e097-11eb-93af-e978a19976e0.png)  
+
+2) 결제 상태 paid  
+![image](https://user-images.githubusercontent.com/84304007/125005909-e1ecad00-e097-11eb-8fa8-479248030ad0.png)  
+
+3) 예약 상태 변경  
+![image](https://user-images.githubusercontent.com/84304007/125005965-fd57b800-e097-11eb-8305-f1bfa409c409.png)
+
+4) mypage에 모두 저장됨  
+![image](https://user-images.githubusercontent.com/84304007/125005999-0ea0c480-e098-11eb-8066-61a913fec373.png)
+
+5) 고객이 Review 등록  
+![image](https://user-images.githubusercontent.com/84304007/125006040-25dfb200-e098-11eb-8970-c07ab8ddba2a.png)
+
+6) Review 등록 하면 order와 mypage의 review 값 모두 반영됨  
+![image](https://user-images.githubusercontent.com/84304007/125006072-3d1e9f80-e098-11eb-869b-21ab1e31f291.png)  
+![image](https://user-images.githubusercontent.com/84304007/125006081-414abd00-e098-11eb-926d-0d31cbafd841.png)
+
+
+
 ## 폴리글랏 퍼시스턴스
 비지니스 로직은 내부에 순수한 형태로 구현
 그 이외의 것을 어댑터 형식으로 설계 하여 해당 비지니스 로직이 어느 환경에서도 잘 도착하도록 설계
