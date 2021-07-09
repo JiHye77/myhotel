@@ -797,43 +797,21 @@ kubectl get deployment
 - Hystrix 를 설정:  요청처리 쓰레드에서 처리시간이 610 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
 - 임의의 부하처리를 위해 결제서비스내 sleep을 random하게 적용하였다.
 ```
-# Order 서비스, application.yml에 추가
+# Order 서비스, application.yml에 추가  
+```  
+![image](https://user-images.githubusercontent.com/84304007/125008658-ecaa4080-e09d-11eb-9cd8-151afa003c06.png)  
+![image](https://user-images.githubusercontent.com/84304007/125008728-0c416900-e09e-11eb-8aea-6a01093b3ab9.png)
 
-feign:
-  hystrix:
-    enabled: true
 
-hystrix:
-  command:
-    # 전역설정
-    default:
-      execution.isolation.thread.timeoutInMilliseconds: 610
-
-```
 * 부하테스터 siege 툴을 통한 서킷 브레이커 동작 확인:  
 - 동시사용자 100명으로 부하 생성시 서킷 브레이커 동작 확인  
 ```  
 siege -c100 -t60S -v --content-type "application/json" 'http://a6fb12afceb3241e5b3cee8a2f04e18c-312668797.ca-central-1.elb.amazonaws.com:8080/orders POST {"roomType": "double", "guest": "111"}'    
 
-defaulting to time-based testing: 60 seconds
-
-{	"transactions":			        1054,
-	"availability":			       85.57,
-	"elapsed_time":			       59.74,
-	"data_transferred":		        0.30,
-	"response_time":		        5.47,
-	"transaction_rate":		       17.64,
-	"throughput":			        0.00,
-	"concurrency":			       96.58,
-	"successful_transactions":	        1054,
-	"failed_transactions":		         258,
-	"longest_transaction":		        8.41,
-	"shortest_transaction":		        0.44
-}
-
 ```
-  
-- 85.57% 성공
+ ![image](https://user-images.githubusercontent.com/84304007/125008779-31ce7280-e09e-11eb-9bc7-2655a198d3e1.png)  
+ 
+ 성공 251, 실패 317건 발생  
 
 
 
