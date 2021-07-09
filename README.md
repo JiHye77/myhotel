@@ -64,7 +64,7 @@ Final Project AWS 3차수 - 이지혜
 ## Event Storming
 
 #### ver1 - 이벤트도출
- - MSAEZ 툴에서 이벤트스토밍 작업
+ - MSAEZ 툴에서 이벤트스토밍 작업  
 ![image](https://user-images.githubusercontent.com/84304007/125014364-8b3b9f00-e0a8-11eb-956a-6a74cd37b0a5.png)  
 
 #### ver2 - relation정의  
