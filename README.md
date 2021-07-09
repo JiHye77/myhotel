@@ -854,8 +854,8 @@ root@labs-412292045:/home/project# kubectl autoscale deploy payment --min=1 --ma
 #### 부하테스트 siege pod 설치 및 실행
 
 충분한 시간만큼 부하를 주고,
-그 사이 새로운 image 를 반영후 deployment.yml을 배포
-Siege 로그를 보면서 배포 시 무정지로 배포되는 것을 확인.
+그 사이 새로운 image 를 반영후 deployment.yml을 배포  
+Siege 로그를 보면서 배포 시 무정지로 배포되는 것을 확인.  
 ```
 root@labs-412292045:/home/project# siege -c100 -t60S -r10 -v --content-type "application/json" 'http://a6fb12afceb3241e5b3cee8a2f04e18c-312668797.ca-central-1.elb.amazonaws.com:8080/payments POST {"cardNo": "123"}'  --> 
 
