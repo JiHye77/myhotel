@@ -551,12 +551,14 @@ http localhost:8083/payments orderId=5  #Success
 http localhost:8081/orders/5
 ```
 
-#주문상태 안바뀜 확인 : 주문상태 "null"   
+#주문상태는 안바뀌나, 주문은 가능함 확인 : 주문상태 "null"   
 ![image](https://user-images.githubusercontent.com/84304007/124858834-c1feb000-dfe9-11eb-90dd-26d5069cdc44.png)  
 
 #reservation 서비스 기동  
+```  
 cd /home/project/healthcenter/reservation  
 mvn spring-boot:run
+```  
 
 #주문상태 확인 : 주문 상태가 "Reserved"으로 확인    
 
