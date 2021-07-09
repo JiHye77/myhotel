@@ -65,8 +65,6 @@ Final Project AWS 3차수 - 이지혜
 
 #### ver1 - 이벤트도출
  - MSAEZ 툴에서 이벤트스토밍 작업
- - 업무별 담당자를 분배하여 각 도메인별 command,event,aggregate,policy를 도출
- - 이후 java소스로의 컨버전을 고려하여 네이밍을 영문 대문자로 시작하는 것으로 적용
  - http://www.msaez.io/#/storming/ZI0N0eczMndHZbfdoWRoAVzzp4Q2/mine/fca5d4a029e24554953cdc46b01e5422
 ![ver1](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/storming_1.JPG)
 
