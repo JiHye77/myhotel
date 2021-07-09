@@ -845,7 +845,7 @@ payment   1/1     1            1           139m
 
 - 무정지 배포전 payment서비스의 replic를 3개로 확장.  
 ```
-kubectl autoscale deploy payment --min=1 --max=3 --cpu-percent=15
+root@labs-412292045:/home/project# kubectl autoscale deploy payment --min=1 --max=3 --cpu-percent=15
 ```
 #### Readiness 설정 
 ![2](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/2.PNG)
@@ -857,7 +857,7 @@ kubectl autoscale deploy payment --min=1 --max=3 --cpu-percent=15
 그 사이 새로운 image 를 반영후 deployment.yml을 배포
 Siege 로그를 보면서 배포 시 무정지로 배포되는 것을 확인.
 ```
-siege -c100 -t60S -r10 -v --content-type "application/json" 'http://a6fb12afceb3241e5b3cee8a2f04e18c-312668797.ca-central-1.elb.amazonaws.com:8080/payments POST {"cardNo": "123"}'  --> 
+root@labs-412292045:/home/project# siege -c100 -t60S -r10 -v --content-type "application/json" 'http://a6fb12afceb3241e5b3cee8a2f04e18c-312668797.ca-central-1.elb.amazonaws.com:8080/payments POST {"cardNo": "123"}'  --> 
 
 ```
 ![image](https://user-images.githubusercontent.com/84304007/125018487-2b48f680-e0b0-11eb-913d-e651f3162441.png)  
