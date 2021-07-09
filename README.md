@@ -1177,7 +1177,7 @@ kubectl exec -it pod/order-574f9b746-q6fkb order -n hotelreservation -- /bin/sh
 ```
 
 ```
-kubectl exec -it pod/order-574f9b746-pl25l order -n hhotelreservation -- /bin/sh
+kubectl exec -it pod/order-574f9b746-pl25l order -n hotelreservation -- /bin/sh
 / # cd /mnt/aws
 /mnt/aws # ls -al
 total 8
