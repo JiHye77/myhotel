@@ -556,7 +556,7 @@ http localhost:8081/orders/5
 
 #reservation 서비스 기동  
 ```  
-cd /home/project/healthcenter/reservation  
+cd /home/project/myhotel/reservation  
 mvn spring-boot:run
 ```  
 
