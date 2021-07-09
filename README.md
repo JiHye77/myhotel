@@ -889,9 +889,6 @@ Events:          <none>
 
 #### 부하테스트 siege pod 설치 및 실행
 
-
-![3](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/3.PNG)
-
 충분한 시간만큼 부하를 주고,
 그 사이 새로운 image 를 반영후 deployment.yml을 배포
 Siege 로그를 보면서 배포 시 무정지로 배포되는 것을 확인.
@@ -1224,4 +1221,4 @@ kubectl apply -f deployment.yml
             claimName: aws-efs
 ```
 
-결과 확인 못함..
+과정 따라 했으나, 결과 확인 못함..
