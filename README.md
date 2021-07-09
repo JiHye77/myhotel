@@ -842,23 +842,18 @@ payment   1/1     1            1           139m
 
 ## 무정지 배포(Readiness Probe)
 
-- 무정지 배포전 payment 서비스의 replic를 3개로 확장하고 각 서비스의 STATUS가 Running 및 1/1 인 것을 확인한다.
+- 무정지 배포전 payment서비스의 replic를 3개로 확장하고 각 서비스의 STATUS가 Running 및 1/1 인 것을 확인한다.
 ```
-root@labs--244363308:/home/project# kubectl get pod
-NAME                           READY   STATUS             RESTARTS   AGE
-payment-555696c874-6l7wq       1/1     Running            0          5m12s
-payment-555696c874-pgxrr       1/1     Running            0          40m
-payment-555696c874-tp72c       1/1     Running            0          5m12s
-reservation-65ff4b4974-sbbm6   1/1     Running            0          31m
+kubectl autoscale deploy payment --min=1 --max=3 --cpu-percent=15
 ```
 #### Readiness 설정 
 ![2](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/2.PNG)
 -	Readiness 설정 내용 확인
 ```
-root@labs--244363308:/home/project# kubectl describe deploy payment -n healthcenter
+kubectl describe deploy payment -n hotelreservation
 Name:                   payment
-Namespace:              healthcenter
-CreationTimestamp:      Mon, 21 Jun 2021 13:02:37 +0000
+Namespace:              hotelreservation
+CreationTimestamp:      Mon, 09 Jul 2021 10:02:37 +0000
 Labels:                 app=order
 Annotations:            deployment.kubernetes.io/revision: 1
 Selector:               app=payment
@@ -870,7 +865,7 @@ Pod Template:
   Labels:  app=payment
   Containers:
    payment:
-    Image:      740569282574.dkr.ecr.ap-northeast-2.amazonaws.com/payment:v1
+    Image:      879772956301.dkr.ecr.ca-central-1.amazonaws.com/payment:v1
     Port:       8080/TCP
     Host Port:  0/TCP
     Limits:
@@ -878,7 +873,7 @@ Pod Template:
     Requests:
       cpu:        200m
     Liveness:     http-get http://:8080/actuator/health delay=120s timeout=2s period=5s #success=1 #failure=5
-    Readiness:    http-get http://:8080/actuator/health delay=10s timeout=2s period=5s #success=1 #failure=10   #<---적용됨
+    Readiness:    http-get http://:8080/actuator/health delay=10s timeout=2s period=5s #success=1 #failure=10   #<---적용됨 확인
     Environment:  <none>
     Mounts:       <none>
   Volumes:        <none>
@@ -903,19 +898,15 @@ Siege 로그를 보면서 배포 시 무정지로 배포되는 것을 확인.
 ```
 root@siege:/# siege -c1 -t60S -v http://payment:8080/payment   ==> 60초 설정
 ```
-![4](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/4.PNG)
-![5](https://github.com/mulcung03/AWS3_healthcenter/blob/main/refer/5.PNG)
---> 수정필요. paymentHistory로 해서 날린걸로 변경했어야함. not found증적임. 
---> 수정한 증적은 아래...
 ```
-HTTP/1.1 200     0.01 secs:    6788 bytes ==> GET  /paymentHistories
-HTTP/1.1 200     0.01 secs:    6788 bytes ==> GET  /paymentHistories
-HTTP/1.1 200     0.00 secs:    6788 bytes ==> GET  /paymentHistories
-HTTP/1.1 200     0.01 secs:    6788 bytes ==> GET  /paymentHistories
-HTTP/1.1 200     0.00 secs:    6788 bytes ==> GET  /paymentHistories
+HTTP/1.1 200     0.01 secs:    6788 bytes ==> GET  /payment
+HTTP/1.1 200     0.01 secs:    6788 bytes ==> GET  /payment
+HTTP/1.1 200     0.00 secs:    6788 bytes ==> GET  /payment
+HTTP/1.1 200     0.01 secs:    6788 bytes ==> GET  /payment
+HTTP/1.1 200     0.00 secs:    6788 bytes ==> GET  /payment
 
 Lifting the server siege...
-Transactions:                   9379 hits
+Transactions:                   8247 hits
 Availability:                 100.00 %
 Elapsed time:                  59.27 secs
 ```
