@@ -842,7 +842,7 @@ payment   1/1     1            1           139m
 
 ## 무정지 배포(Readiness Probe)
 
-<!-- - 무정지 배포전 payment 서비스의 replic를 3개로 확장하고 각 서비스의 STATUS가 Running 및 1/1 인 것을 확인한다.
+- 무정지 배포전 payment 서비스의 replic를 3개로 확장하고 각 서비스의 STATUS가 Running 및 1/1 인 것을 확인한다.
 ```
 root@labs--244363308:/home/project# kubectl get pod
 NAME                           READY   STATUS             RESTARTS   AGE
@@ -919,7 +919,7 @@ Transactions:                   9379 hits
 Availability:                 100.00 %
 Elapsed time:                  59.27 secs
 ```
- -->
+
 
 ## Self Healing(Liveness Probe)
 - deployment.yml 을 /tmp/healthy 파일을 만들고 90초 후 삭제 후 
